@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Primary Meta -->
+  <title>Veera Kumar R — Web Developer | B.Tech AI &amp; Data Science</title>
+  <meta name="description" content="Portfolio of Veera Kumar R, a motivated B.Tech Artificial Intelligence and Data Science student focused on web development, design, and data-driven solutions." />
+  <meta name="keywords" content="Veera Kumar R, portfolio, web developer, Python, HTML, CSS, AI, Data Science, FlutterFlow, Colab" />
+  <meta name="author" content="Veera Kumar R" />
+  <link rel="canonical" href="https://veerakumar-r.github.io/" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://veerakumar-r.github.io/" />
+  <meta property="og:title" content="Veera Kumar R — Web Developer | AI &amp; Data Science" />
+  <meta property="og:description" content="Motivated B.Tech Artificial Intelligence and Data Science student building useful technology solutions and web experiences." />
+  <meta property="og:image" content="assets/images/profile.jpg" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Veera Kumar R — Web Developer | AI &amp; Data Science" />
+  <meta name="twitter:description" content="B.Tech AI &amp; Data Science | Web Developer | Python | HTML | CSS" />
+  <meta name="twitter:image" content="assets/images/profile.jpg" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- Structured JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Veera Kumar R",
+    "jobTitle": "Web Developer | B.Tech AI & Data Science",
+    "url": "https://veerakumar-r.github.io/",
+    "sameAs": [
+      "https://github.com/veerakumar2512",
+      "https://linkedin.com/in/veera-kumar-521044428"
+    ],
+    "knowsAbout": ["Python", "HTML5", "CSS3", "Web Development", "Data Science", "FlutterFlow", "Colab", "Stitch", "Discord"]
+  }
+  </script>
+</head>
+
+<body>
+  <!-- ============================================================
+       0. CINEMATIC PRELOADER SEQUENCE (Matches Video Frame-by-Frame)
+  ============================================================ -->
+  <div id="preloader" aria-hidden="true">
+    <div class="preloader-stage">
+      <!-- Angled Exclamation Mark: Bar & Dot -->
+      <div class="preloader-exclamation" id="preloader-exclamation">
+        <div class="preloader-bar" id="preloader-bar"></div>
+        <div class="preloader-dot" id="preloader-dot"></div>
+      </div>
+      <!-- Kinetic Morphing Typography -->
+      <div class="preloader-title" id="preloader-title"></div>
+    </div>
+    <button id="preloader-skip" class="preloader-skip" aria-label="Skip Intro">SKIP</button>
+  </div>
+
+  <!-- Ambient Starfield Canvas -->
+  <canvas id="ambient-canvas" aria-hidden="true"></canvas>
+
+  <!-- ============================================================
+       1. FIXED TOP NAVBAR
+  ============================================================ -->
+  <header id="navbar" role="banner">
+    <div class="container nav-container">
+      <a href="#hero" class="nav-brand" aria-label="Veera Kumar R Home">
+        VEERAKUMAR
+      </a>
+
+      <!-- Minimal 2-Line Hamburger -->
+      <button class="nav-burger" id="nav-burger" aria-label="Open navigation menu" aria-expanded="false" aria-controls="fullscreen-menu">
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       2. FULLSCREEN CURTAIN NAVIGATION DRAWER
+  ============================================================ -->
+  <div id="fullscreen-menu" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Navigation Menu">
+    <div class="menu-top-bar">
+      <span class="nav-brand">VEERAKUMAR</span>
+      <button class="menu-close-btn" id="menu-close" aria-label="Close navigation menu">✕</button>
+    </div>
+
+    <ul class="menu-nav-list" role="list">
+      <li class="menu-nav-item">
+        <a href="#hero" class="menu-nav-link"><span class="index">01</span> HOME</a>
+      </li>
+      <li class="menu-nav-item">
+        <a href="#about" class="menu-nav-link"><span class="index">02</span> ABOUT</a>
+      </li>
+      <li class="menu-nav-item">
+        <a href="#services" class="menu-nav-link"><span class="index">03</span> SERVICES</a>
+      </li>
+      <li class="menu-nav-item">
+        <a href="#projects" class="menu-nav-link"><span class="index">04</span> PROJECTS</a>
+      </li>
+      <li class="menu-nav-item">
+        <a href="#credentials" class="menu-nav-link"><span class="index">05</span> CREDENTIALS</a>
+      </li>
+      <li class="menu-nav-item">
+        <a href="#contact" class="menu-nav-link"><span class="index">06</span> CONTACT</a>
+      </li>
+    </ul>
+
+    <div class="menu-footer-bar">
+      <div>🟢 Available for internships &amp; freelance projects</div>
+      <div class="menu-social-links">
+        <a href="https://github.com/veerakumar2512" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+        <a href="https://linkedin.com/in/veera-kumar-521044428" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
+        <a href="mailto:veerakumar25122006@gmail.com" target="_blank" rel="noopener noreferrer">Email ↗</a>
+      </div>
+    </div>
+  </div>
+
+  <main id="main-content">
+    <!-- ============================================================
+         3. HERO SECTION
+    ============================================================ -->
+    <section id="hero" aria-label="Introduction">
+      <div class="container hero-layout">
+        <!-- Giant Metallic Headline -->
+        <h1 class="hero-headline">PORTFOLIO</h1>
+
+        <!-- Subtitle -->
+        <div class="hero-subhead">
+          <span>Web Developer</span> <em>| AI &amp; DS</em>
+        </div>
+
+        <!-- Call to Actions -->
+        <div class="hero-actions">
+          <a href="#contact" class="btn-pill btn-pill-primary">
+            Contact <span>↗</span>
+          </a>
+          <a href="assets/resume/veera-kumar-resume.pdf" download="Veera_Kumar_R_Resume.pdf" class="btn-pill btn-pill-outline">
+            Resume <span>↓</span>
+          </a>
+        </div>
+
+        <!-- Borderless Seamless 3D Particle Portrait -->
+        <div class="particle-portrait-stage" aria-label="Interactive particle portrait">
+          <canvas id="halftone-canvas" title="Interactive Halftone Particle Portrait"></canvas>
+          <noscript>
+            <img src="assets/images/halftone_avatar.jpg" alt="Veera Kumar R" class="avatar-fallback-img" />
+          </noscript>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div class="hero-scroll-hint" aria-hidden="true">
+          <span>Scroll</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         4. ABOUT SECTION ("INTRO") & THE STACK
+    ============================================================ -->
+    <section id="about" class="section" aria-labelledby="about-heading">
+      <div class="container">
+        <div class="section-tag">
+          <span class="section-tag-dot"></span>
+          ABOUT ME
+        </div>
+
+        <h2 class="section-title" id="about-heading">
+          <strong>Intro</strong>
+        </h2>
+
+        <div class="luxury-card fade-in">
+          <p class="intro-bio-text">
+            Hey, I'm <strong>Veera Kumar</strong>. I am a motivated <strong>B.Tech Artificial Intelligence and Data Science</strong> student with knowledge of <strong>Python</strong>, <strong>HTML</strong>, and <strong>CSS</strong>, seeking entry-level opportunities in web development. I enjoy building practical technology solutions, applying my skills through projects, and continuously growing through learning and problem-solving.
+          </p>
+
+          <div class="intro-metrics-row">
+            <div class="metric-stat-item">
+              <span class="metric-num">B.Tech</span>
+              <span class="metric-label">Artificial Intelligence &amp; Data Science</span>
+            </div>
+            <div class="metric-stat-item">
+              <span class="metric-num">3</span>
+              <span class="metric-label">Major project areas</span>
+            </div>
+            <div class="metric-stat-item">
+              <span class="metric-num">2</span>
+              <span class="metric-label">Internship trainings</span>
+            </div>
+            <div class="metric-stat-item">
+              <span class="metric-num">1</span>
+              <span class="metric-label">National seminar participation</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- THE STACK -->
+        <div class="stack-section fade-in">
+          <div class="section-tag">
+            <span class="section-tag-dot"></span>
+            THE STACK
+          </div>
+
+          <div class="stack-grid">
+            <span class="stack-pill"><span class="stack-pill-dot"></span>Python</span>
+            <span class="stack-pill"><span class="stack-pill-dot"></span>HTML5</span>
+            <span class="stack-pill"><span class="stack-pill-dot"></span>CSS3</span>
+            <span class="stack-pill"><span class="stack-pill-dot"></span>FlutterFlow</span>
+            <span class="stack-pill"><span class="stack-pill-dot"></span>Stitch</span>
+            <span class="stack-pill"><span class="stack-pill-dot"></span>Google Colab</span>
+            <span class="stack-pill"><span class="stack-pill-dot"></span>Discord</span>
+            <span class="stack-pill"><span class="stack-pill-dot"></span>Web Development</span>
+            <span class="stack-pill"><span class="stack-pill-dot"></span>Data Science</span>
+            <span class="stack-pill"><span class="stack-pill-dot"></span>Problem Solving</span>
+            <span class="stack-pill"><span class="stack-pill-dot"></span>Team Collaboration</span>
+            <span class="stack-pill"><span class="stack-pill-dot"></span>Continuous Learning</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         5. SERVICES / CAPABILITIES ("WHAT I DO")
+    ============================================================ -->
+    <section id="services" class="section" aria-labelledby="services-heading">
+      <div class="container">
+        <div class="section-tag">
+          <span class="section-tag-dot"></span>
+          CAPABILITIES
+        </div>
+
+        <h2 class="section-title" id="services-heading">
+          <strong>WHAT I DO</strong>
+        </h2>
+        <p class="section-subtitle">
+          Building practical web experiences and data-driven solutions aligned with my academic and internship work.
+        </p>
+
+        <div class="accordion-wrapper" role="region" aria-label="Services List">
+          <!-- Item 01 -->
+          <div class="accordion-item fade-in">
+            <button class="accordion-header" aria-expanded="false">
+              <div class="accordion-title-group">
+                <span class="accordion-num">01</span>
+                <span class="accordion-heading">Web Development</span>
+              </div>
+              <span class="accordion-arrow">↘</span>
+            </button>
+            <div class="accordion-content">
+              <div class="accordion-body">
+                Designing and building user-friendly web interfaces and practical digital solutions with a focus on simple, effective products.
+                <div class="accordion-tech-row">
+                  <span class="accordion-tag">Python</span>
+                  <span class="accordion-tag">HTML5 / CSS3</span>
+                  <span class="accordion-tag">FlutterFlow</span>
+                  <span class="accordion-tag">Responsive Design</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Item 02 -->
+          <div class="accordion-item fade-in">
+            <button class="accordion-header" aria-expanded="false">
+              <div class="accordion-title-group">
+                <span class="accordion-num">02</span>
+                <span class="accordion-heading">Data Science &amp; Research</span>
+              </div>
+              <span class="accordion-arrow">↘</span>
+            </button>
+            <div class="accordion-content">
+              <div class="accordion-body">
+                Applying data-driven thinking to analyze patterns, build insights, and support decision-making in real-world problems and academic projects.
+                <div class="accordion-tech-row">
+                  <span class="accordion-tag">Python</span>
+                  <span class="accordion-tag">Colab</span>
+                  <span class="accordion-tag">Data Analysis</span>
+                  <span class="accordion-tag">Visualization</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Item 03 -->
+          <div class="accordion-item fade-in">
+            <button class="accordion-header" aria-expanded="false">
+              <div class="accordion-title-group">
+                <span class="accordion-num">03</span>
+                <span class="accordion-heading">Project-Based Problem Solving</span>
+              </div>
+              <span class="accordion-arrow">↘</span>
+            </button>
+            <div class="accordion-content">
+              <div class="accordion-body">
+                Translating concepts into working prototypes across sustainability, mobility, and direct-selling use cases with a strong focus on learning by building.
+                <div class="accordion-tech-row">
+                  <span class="accordion-tag">GreenPulse</span>
+                  <span class="accordion-tag">Q-Sync</span>
+                  <span class="accordion-tag">Carbon Control</span>
+                  <span class="accordion-tag">Innovation</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Item 04 -->
+          <div class="accordion-item fade-in">
+            <button class="accordion-header" aria-expanded="false">
+              <div class="accordion-title-group">
+                <span class="accordion-num">04</span>
+                <span class="accordion-heading">Learning &amp; Collaboration</span>
+              </div>
+              <span class="accordion-arrow">↘</span>
+            </button>
+            <div class="accordion-content">
+              <div class="accordion-body">
+                Continuously learning new tools and technologies while working effectively with teams, adapting quickly, and supporting collaborative execution.
+                <div class="accordion-tech-row">
+                  <span class="accordion-tag">Adaptability</span>
+                  <span class="accordion-tag">Teamwork</span>
+                  <span class="accordion-tag">Learning</span>
+                  <span class="accordion-tag">Stitch</span>
+                </div>
+              </div>
+            </div>
+          </div>
+                  <span class="accordion-tag">FastAPI</span>
+                  <span class="accordion-tag">Postman</span>
+                  <span class="accordion-tag">SQLite / MySQL</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Item 05 -->
+          <div class="accordion-item fade-in">
+            <button class="accordion-header" aria-expanded="false">
+              <div class="accordion-title-group">
+                <span class="accordion-num">05</span>
+                <span class="accordion-heading">Web Scraping &amp; Automation Pipelines</span>
+              </div>
+              <span class="accordion-arrow">↘</span>
+            </button>
+            <div class="accordion-content">
+              <div class="accordion-body">
+                Developing custom web crawlers that extract structured datasets from dynamic target sites, with automated proxy handling, rate-limiting safeguards, and automated exports to Excel/CSV.
+                <div class="accordion-tech-row">
+                  <span class="accordion-tag">BeautifulSoup4</span>
+                  <span class="accordion-tag">Requests</span>
+                  <span class="accordion-tag">Pandas</span>
+                  <span class="accordion-tag">Tkinter GUI</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Item 06 -->
+          <div class="accordion-item fade-in">
+            <button class="accordion-header" aria-expanded="false">
+              <div class="accordion-title-group">
+                <span class="accordion-num">06</span>
+                <span class="accordion-heading">Interactive UI/UX &amp; Modern Frontends</span>
+              </div>
+              <span class="accordion-arrow">↘</span>
+            </button>
+            <div class="accordion-content">
+              <div class="accordion-body">
+                Crafting state-of-the-art web interfaces with dark-mode luxury aesthetics, kinetic particle effects, high-performance canvas shaders, and rigorous WCAG accessibility standards.
+                <div class="accordion-tech-row">
+                  <span class="accordion-tag">Modern CSS / Flexbox / Grid</span>
+                  <span class="accordion-tag">Canvas 2D</span>
+                  <span class="accordion-tag">Micro-animations</span>
+                  <span class="accordion-tag">Mobile First</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         6. SELECTED WORK (PROJECTS SHOWCASE)
+    ============================================================ -->
+    <section id="projects" class="section" aria-labelledby="projects-heading">
+      <div class="container">
+        <div class="section-tag">
+          <span class="section-tag-dot"></span>
+          PORTFOLIO
+        </div>
+
+        <h2 class="section-title" id="projects-heading">
+          <strong>SELECTED</strong> <em>work</em>
+        </h2>
+        <p class="section-subtitle">
+          Curated full-stack applications, data engines, and engineering tools built with precision.
+        </p>
+
+        <!-- Category Filters -->
+        <div id="filter-btns" class="projects-filter-bar" role="tablist" aria-label="Project Categories"></div>
+
+        <!-- Dynamic Projects Grid populated by js/projects.js -->
+        <div id="projects-grid" class="projects-grid" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         7. INTERACTIVE "BREAK IT" LED DOT MATRIX BANNER
+    ============================================================ -->
+    <section class="container" aria-label="Interactive Experience">
+      <div class="interactive-led-banner fade-in">
+        <div class="led-banner-meta">Break it if you can. It still ships.</div>
+        <div class="led-canvas-wrap">
+          <canvas id="led-matrix-canvas" width="600" height="140" title="Interactive LED Dot Matrix Banner"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         8. CREDENTIALS & EDUCATION
+    ============================================================ -->
+    <section id="credentials" class="section" aria-labelledby="credentials-heading">
+      <div class="container">
+        <div class="section-tag">
+          <span class="section-tag-dot"></span>
+          CREDENTIALS
+        </div>
+
+        <h2 class="section-title" id="credentials-heading">
+          <strong>Verified</strong> <em>certifications</em>
+        </h2>
+        <p class="section-subtitle">
+          Industry-recognized coursework and academic milestones complementing my B.Tech engineering foundation.
+        </p>
+
+        <div class="certs-grid">
+          <article class="cert-luxury-card fade-in">
+            <div class="cert-header">
+              <span class="cert-platform-badge">Internship</span>
+              <span class="cert-date">Dec 2025</span>
+            </div>
+            <h3 class="cert-title">Artificial Intelligence</h3>
+            <div class="cert-issuer">Brainery Spot Technology</div>
+            <div class="cert-tags">
+              <span class="project-tag-pill">AI</span>
+              <span class="project-tag-pill">Python</span>
+              <span class="project-tag-pill">Learning</span>
+            </div>
+          </article>
+
+          <article class="cert-luxury-card fade-in">
+            <div class="cert-header">
+              <span class="cert-platform-badge">Internship</span>
+              <span class="cert-date">Jun 2026</span>
+            </div>
+            <h3 class="cert-title">Data Science</h3>
+            <div class="cert-issuer">Crescent Infotech</div>
+            <div class="cert-tags">
+              <span class="project-tag-pill">Data Science</span>
+              <span class="project-tag-pill">Analytics</span>
+              <span class="project-tag-pill">Research</span>
+            </div>
+          </article>
+
+          <article class="cert-luxury-card fade-in">
+            <div class="cert-header">
+              <span class="cert-platform-badge">Seminar</span>
+              <span class="cert-date">Aug 2025</span>
+            </div>
+            <h3 class="cert-title">AI &amp; Quantum Computing</h3>
+            <div class="cert-issuer">Erode Sengunthar Engineering College</div>
+            <div class="cert-tags">
+              <span class="project-tag-pill">AI</span>
+              <span class="project-tag-pill">Quantum</span>
+              <span class="project-tag-pill">Innovation</span>
+            </div>
+          </article>
+
+          <article class="cert-luxury-card fade-in">
+            <div class="cert-header">
+              <span class="cert-platform-badge">Degree</span>
+              <span class="cert-date">2024–2028</span>
+            </div>
+            <h3 class="cert-title">B.Tech AI &amp; Data Science</h3>
+            <div class="cert-issuer">Shree Venkateshwara Hi-Tech Engineering College</div>
+            <div class="cert-tags">
+              <span class="project-tag-pill">CGPA 7.56</span>
+              <span class="project-tag-pill">AI</span>
+              <span class="project-tag-pill">Data Science</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         9. GET IN TOUCH (CONTACT SECTION)
+    ============================================================ -->
+    <section id="contact" class="section" aria-labelledby="contact-heading">
+      <div class="contact-bg-overlay" aria-hidden="true"></div>
+
+      <div class="container contact-layout">
+        <!-- Direct Contact Column -->
+        <div class="fade-in">
+          <div class="status-badge">
+            <span class="status-pulsing-dot"></span>
+            AVAILABLE FOR WORK
+          </div>
+
+          <h2 class="contact-title" id="contact-heading">
+            Get in touch
+          </h2>
+
+          <p class="contact-subtext">
+            Open to internship roles, project collaborations, and opportunities to grow as a web developer and data science student.
+          </p>
+
+          <!-- Quick Action Buttons -->
+          <div class="contact-quick-actions">
+            <a href="https://wa.me/916381227867?text=Hi%20Veera,%20I%20saw%20your%20portfolio!" target="_blank" rel="noopener noreferrer" class="btn-contact-action btn-whatsapp">
+              Message on WhatsApp <span>↗</span>
+            </a>
+            <a href="mailto:veerakumar25122006@gmail.com" class="btn-contact-action btn-email-direct">
+              Send an email <span>✉</span>
+            </a>
+          </div>
+
+          <!-- Contact Details Cards with Copy -->
+          <div class="contact-cards-group">
+            <div class="contact-detail-card">
+              <div>
+                <div class="detail-label">Email</div>
+                <div class="detail-value">veerakumar25122006@gmail.com</div>
+              </div>
+              <button class="btn-copy" data-copy-target="veerakumar25122006@gmail.com" aria-label="Copy Email">
+                Copy
+              </button>
+            </div>
+
+            <div class="contact-detail-card">
+              <div>
+                <div class="detail-label">Phone</div>
+                <div class="detail-value">+91 63812 27867</div>
+              </div>
+              <button class="btn-copy" data-copy-target="+916381227867" aria-label="Copy Phone Number">
+                Copy
+              </button>
+            </div>
+
+            <div class="contact-detail-card">
+              <div>
+                <div class="detail-label">Location</div>
+                <div class="detail-value">Tirupur, Tamil Nadu</div>
+              </div>
+              <span style="font-family:var(--font-mono);font-size:0.8rem;color:var(--clr-text-faint);">IST (UTC+5:30)</span>
+            </div>
+
+            <div class="contact-detail-card">
+              <div>
+                <div class="detail-label">Socials</div>
+                <div class="detail-value" style="display:flex;gap:1.25rem;margin-top:0.35rem;">
+                  <a href="https://github.com/veerakumar2512" target="_blank" rel="noopener noreferrer" style="color:var(--clr-accent-cyan);">GitHub ↗</a>
+                  <a href="https://linkedin.com/in/veera-kumar-521044428" target="_blank" rel="noopener noreferrer" style="color:var(--clr-accent-cyan);">LinkedIn ↗</a>
+                  <a href="mailto:veerakumar25122006@gmail.com" target="_blank" rel="noopener noreferrer" style="color:var(--clr-accent-cyan);">Email ↗</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Form Card -->
+        <div class="contact-form-card fade-in">
+          <form id="contact-form" novalidate aria-label="Contact Form">
+            <div class="form-group">
+              <label for="contact-name">Name <span style="color:#f87171;">*</span></label>
+              <input type="text" id="contact-name" name="name" placeholder="Your Name" autocomplete="name" required />
+              <span id="contact-name-error" class="field-error" role="alert"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="contact-email">Email <span style="color:#f87171;">*</span></label>
+              <input type="email" id="contact-email" name="email" placeholder="your.email@example.com" autocomplete="email" required />
+              <span id="contact-email-error" class="field-error" role="alert"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="contact-subject">Subject <span style="color:#f87171;">*</span></label>
+              <input type="text" id="contact-subject" name="subject" placeholder="Internship / Project Opportunity" required />
+              <span id="contact-subject-error" class="field-error" role="alert"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="contact-message">Message <span style="color:#f87171;">*</span></label>
+              <textarea id="contact-message" name="message" rows="4" placeholder="Tell me about your project or role..." required></textarea>
+              <span id="contact-message-error" class="field-error" role="alert"></span>
+            </div>
+
+            <!-- Anti-spam Honeypot -->
+            <input type="text" name="_gotcha" style="display:none;" tabindex="-1" autocomplete="off" />
+
+            <button type="submit" class="btn-pill btn-pill-primary" id="contact-submit" style="width:100%;justify-content:center;padding:0.95rem;">
+              Send Message ↗
+            </button>
+
+            <div id="form-status" class="form-status" role="alert"></div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============================================================
+       10. FOOTER
+  ============================================================ -->
+  <footer role="contentinfo">
+    <div class="container footer-inner">
+      <div class="footer-copy">
+        &copy; <span id="year">2026</span> Veera Kumar R. Built with pure precision.
+      </div>
+
+      <nav class="footer-links" aria-label="Footer Navigation">
+        <a href="#hero">Home</a>
+        <a href="#about">About</a>
+        <a href="#services">Services</a>
+        <a href="#projects">Projects</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </footer>
+
+  <!-- ============================================================
+       11. PROJECT DETAIL MODAL
+  ============================================================ -->
+  <div id="project-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modal-title">
+    <div class="modal" tabindex="-1">
+      <div class="modal-header">
+        <span id="modal-title" style="font-weight:700;font-size:0.95rem;color:#ffffff;">Project Overview</span>
+        <button class="modal-close" id="modal-close-btn" aria-label="Close modal">✕</button>
+      </div>
+      <div class="modal-body" id="modal-body-content"></div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       12. BACK TO TOP BUTTON
+  ============================================================ -->
+  <button id="back-to-top" aria-label="Back to top" style="
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--clr-border-hov);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s, background 0.3s, transform 0.3s;
+    z-index: 500;
+    backdrop-filter: blur(12px);
+  ">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+  </button>
+
+  <!-- ============================================================
+       13. SCRIPTS
+  ============================================================ -->
+  <script src="js/projects.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/form.js"></script>
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
