@@ -165,4 +165,4 @@ vercel --prod
 
 ---
 
-*Built with ❤️ as part of my personal branding journey as a B.Tech CSE student.*
+*Built with ❤️ as part of my personal branding journey as a B.Tech AI&DS student.*
