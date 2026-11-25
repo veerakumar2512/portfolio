@@ -134,6 +134,17 @@
          3. HERO SECTION
     ============================================================ -->
     <section id="hero" aria-label="Introduction">
+      <!-- Full-Page 3D Particle Portrait Stage -->
+      <div class="particle-portrait-stage" aria-label="Interactive particle portrait">
+        <div class="portrait-photo-container">
+          <img src="assets/images/halftone_avatar.jpg" alt="Veera Kumar R" class="hero-portrait-img" id="hero-portrait-img" />
+        </div>
+        <canvas id="halftone-canvas" title="Interactive Halftone Particle Portrait"></canvas>
+        <noscript>
+          <img src="assets/images/halftone_avatar.jpg" alt="Veera Kumar R" class="avatar-fallback-img" />
+        </noscript>
+      </div>
+
       <div class="container hero-layout">
         <!-- Giant Metallic Headline -->
         <h1 class="hero-headline">PORTFOLIO</h1>
@@ -151,14 +162,6 @@
           <a href="assets/resume/veera-kumar-resume.pdf" download="Veera_Kumar_R_Resume.pdf" class="btn-pill btn-pill-outline">
             Resume <span>↓</span>
           </a>
-        </div>
-
-        <!-- Borderless Seamless 3D Particle Portrait -->
-        <div class="particle-portrait-stage" aria-label="Interactive particle portrait">
-          <canvas id="halftone-canvas" title="Interactive Halftone Particle Portrait"></canvas>
-          <noscript>
-            <img src="assets/images/halftone_avatar.jpg" alt="Veera Kumar R" class="avatar-fallback-img" />
-          </noscript>
         </div>
 
         <!-- Scroll Indicator -->
@@ -688,6 +691,7 @@
        13. SCRIPTS
   ============================================================ -->
   <script src="js/projects.js"></script>
+  <script src="js/avatar-data.js"></script>
   <script src="js/main.js"></script>
   <script src="js/form.js"></script>
   <script>

@@ -210,228 +210,334 @@
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const img = new Image();
-    img.src = "assets/images/halftone_avatar.jpg";
+    const hero = document.getElementById("hero") || canvas.parentElement || document.body;
+    const heroImg = document.getElementById("hero-portrait-img");
 
-    img.onload = () => {
-      const stage = canvas.parentElement;
-      const naturalAspect = img.naturalHeight / (img.naturalWidth || 1) || 1.48;
+    let isAssembling = false;
+    let assembleProgress = 0;
+    let hasTriggeredAssembly = false;
 
-      let renderWidth = Math.min(stage.clientWidth || 440, 460);
-      let renderHeight = renderWidth * naturalAspect;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-      function setupCanvasSize() {
-        renderWidth = Math.min(stage.clientWidth || 440, 460);
-        renderHeight = renderWidth * naturalAspect;
-        canvas.width = renderWidth * dpr;
-        canvas.height = renderHeight * dpr;
-        canvas.style.width = renderWidth + "px";
-        canvas.style.height = renderHeight + "px";
-      }
-      setupCanvasSize();
-
-      const offCanvas = document.createElement("canvas");
-      const offCtx = offCanvas.getContext("2d");
-
-      // High-resolution sample grid (92 columns for crystal clear facial features & stars)
-      const sampleCols = 92;
-      const sampleRows = Math.floor(sampleCols * naturalAspect);
-      offCanvas.width = sampleCols;
-      offCanvas.height = sampleRows;
-
-      offCtx.drawImage(img, 0, 0, sampleCols, sampleRows);
-      const imgData = offCtx.getImageData(0, 0, sampleCols, sampleRows).data;
-
-      const particles = [];
-      const colStep = renderWidth / sampleCols;
-      const rowStep = renderHeight / sampleRows;
-
-      for (let y = 0; y < sampleRows; y++) {
-        for (let x = 0; x < sampleCols; x++) {
-          const idx = (y * sampleCols + x) * 4;
-          const r = imgData[idx];
-          const g = imgData[idx + 1];
-          const b = imgData[idx + 2];
-          const brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-
-          // Only keep points with luminance (ignoring deep black background)
-          if (brightness > 0.08) {
-            const targetX = x * colStep + colStep / 2;
-            const targetY = y * rowStep + rowStep / 2;
-            const baseSize = Math.max(0.7, brightness * (colStep * 0.96));
-
-            // Random initial scatter angle & 3D depth in space
-            const scatterAngle = Math.random() * Math.PI * 2;
-            const scatterRadius = 160 + Math.random() * 400;
-            const scatterZ = (Math.random() - 0.5) * 500;
-
-            particles.push({
-              origX: targetX,
-              origY: targetY,
-              origZ: 0,
-              x: targetX + Math.cos(scatterAngle) * scatterRadius,
-              y: targetY + Math.sin(scatterAngle) * scatterRadius,
-              z: scatterZ,
-              vx: (Math.random() - 0.5) * 2,
-              vy: (Math.random() - 0.5) * 2,
-              vz: (Math.random() - 0.5) * 2,
-              baseSize: baseSize,
-              brightness: brightness,
-              alpha: 0.1,
-              targetAlpha: Math.min(1.0, 0.45 + brightness * 0.55),
-              r: r,
-              g: g,
-              b: b,
-              isStar: brightness > 0.85 && Math.random() < 0.15,
-              seedX: Math.cos(scatterAngle),
-              seedY: Math.sin(scatterAngle),
-              seedZ: (Math.random() - 0.5) * 2
-            });
-          }
-        }
-      }
-
-      let isAssembling = false;
-      let assembleProgress = 0;
-
-      window.PortfolioAnim.triggerAvatarAssembly = function () {
-        isAssembling = true;
-      };
-
-      // Cursor / Touch 3D Radial Physics Force
-      let mouse = { x: -9999, y: -9999, radius: 85 };
-
-      function updateMousePos(clientX, clientY) {
-        const rect = canvas.getBoundingClientRect();
-        mouse.x = (clientX - rect.left) * (renderWidth / rect.width);
-        mouse.y = (clientY - rect.top) * (renderHeight / rect.height);
-      }
-
-      canvas.addEventListener("mousemove", (e) => {
-        updateMousePos(e.clientX, e.clientY);
-      });
-
-      canvas.addEventListener("mouseleave", () => {
-        mouse.x = -9999;
-        mouse.y = -9999;
-      });
-
-      canvas.addEventListener("touchmove", (e) => {
-        if (e.touches.length > 0) {
-          updateMousePos(e.touches[0].clientX, e.touches[0].clientY);
-        }
-      }, { passive: true });
-
-      canvas.addEventListener("touchend", () => {
-        mouse.x = -9999;
-        mouse.y = -9999;
-      });
-
-      // Scroll-Triggered Assembly & Dispersion
-      let scrollOffset = 0;
-      window.addEventListener("scroll", () => {
-        scrollOffset = window.scrollY;
-      }, { passive: true });
-
-      window.addEventListener("resize", () => {
-        setupCanvasSize();
-      }, { passive: true });
-
-      const fov = 550; // 3D Camera Field of View
-
-      function animate() {
-        ctx.save();
-        ctx.scale(dpr, dpr);
-        ctx.clearRect(0, 0, renderWidth, renderHeight);
-
-        if (isAssembling && assembleProgress < 1.0) {
-          assembleProgress += 0.024;
-          if (assembleProgress > 1.0) assembleProgress = 1.0;
-        }
-
-        // Scroll dispersion factor: after 380px, particles scatter back into 3D space
-        const scrollDispersion = Math.max(0, scrollOffset - 380) * 0.9;
-        const scrollFade = scrollOffset <= 380 ? 1.0 : Math.max(0, 1 - (scrollOffset - 380) / 580);
-
-        for (let i = 0; i < particles.length; i++) {
-          const p = particles[i];
-
-          if (isAssembling) {
-            // Target position incorporates scroll dispersion in 3D
-            const targetX = p.origX + (p.seedX * scrollDispersion * 0.85);
-            const targetY = p.origY + (p.seedY * scrollDispersion * 0.65) - (scrollDispersion * 0.3);
-            const targetZ = p.origZ + (p.seedZ * scrollDispersion * 1.5);
-
-            // Magnetic attraction force toward 3D target coordinates
-            const dx = targetX - p.x;
-            const dy = targetY - p.y;
-            const dz = targetZ - p.z;
-
-            p.vx += dx * (0.045 + assembleProgress * 0.05);
-            p.vy += dy * (0.045 + assembleProgress * 0.05);
-            p.vz += dz * (0.045 + assembleProgress * 0.05);
-
-            // Friction damping
-            p.vx *= 0.83;
-            p.vy *= 0.83;
-            p.vz *= 0.83;
-
-            p.x += p.vx;
-            p.y += p.vy;
-            p.z += p.vz;
-
-            p.alpha = Math.min(p.targetAlpha, p.alpha + 0.035);
-          } else {
-            // Ambient drift before assembly
-            p.x += p.vx * 0.25;
-            p.y += p.vy * 0.25;
-            p.z += p.vz * 0.25;
-          }
-
-          // 3D Perspective Projection Calculation
-          const scale = fov / Math.max(20, fov + p.z);
-          const projX = (renderWidth / 2) + (p.x - (renderWidth / 2)) * scale;
-          const projY = (renderHeight / 2) + (p.y - (renderHeight / 2)) * scale;
-          const projSize = Math.max(0.4, p.baseSize * scale);
-
-          // Cursor / Touch 3D Radial Physics Force
-          const mdx = projX - mouse.x;
-          const mdy = projY - mouse.y;
-          const mdist = Math.hypot(mdx, mdy);
-
-          if (mdist < mouse.radius) {
-            const force = (mouse.radius - mdist) / mouse.radius;
-            const angle = Math.atan2(mdy, mdx);
-            p.vx += Math.cos(angle) * force * 11;
-            p.vy += Math.sin(angle) * force * 11;
-            p.vz += (Math.random() - 0.5) * force * 40; // Depth explosion
-          }
-
-          const drawAlpha = Math.max(0, p.alpha * scrollFade * Math.min(1.2, scale));
-
-          if (drawAlpha > 0.02 && projX >= -10 && projX <= renderWidth + 10 && projY >= -10 && projY <= renderHeight + 10) {
-            ctx.beginPath();
-            ctx.arc(projX, projY, projSize, 0, Math.PI * 2);
-            ctx.fillStyle = `rgb(${p.r}, ${p.g}, ${p.b})`;
-            ctx.globalAlpha = drawAlpha;
-
-            if (p.isStar) {
-              ctx.shadowBlur = Math.min(10, 5 * scale);
-              ctx.shadowColor = "#ffffff";
-            }
-            ctx.fill();
-            ctx.shadowBlur = 0;
-            ctx.globalAlpha = 1.0;
-          }
-        }
-
-        ctx.restore();
-        requestAnimationFrame(animate);
-      }
-
-      animate();
+    // Trigger dispatcher hook (ready even before any loading)
+    window.PortfolioAnim.triggerAvatarAssembly = function () {
+      hasTriggeredAssembly = true;
+      isAssembling = true;
+      if (heroImg) heroImg.classList.add("assembled");
     };
+
+    let sampleCols = 104;
+    let sampleRows = 151;
+    let naturalAspect = 1.4519;
+
+    if (window.AVATAR_DIMS) {
+      sampleCols = window.AVATAR_DIMS.cols || sampleCols;
+      sampleRows = window.AVATAR_DIMS.rows || sampleRows;
+      naturalAspect = window.AVATAR_DIMS.aspect || naturalAspect;
+    }
+
+    let renderWidth = 0;
+    let renderHeight = 0;
+    let drawWidth = 0;
+    let drawHeight = 0;
+    let offsetX = 0;
+    let offsetY = 0;
+    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    function updateDimensions() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      renderWidth = hero.clientWidth || window.innerWidth;
+      renderHeight = hero.clientHeight || window.innerHeight;
+
+      canvas.width = renderWidth * dpr;
+      canvas.height = renderHeight * dpr;
+      canvas.style.width = renderWidth + "px";
+      canvas.style.height = renderHeight + "px";
+
+      // Fit portrait to viewport dimensions:
+      const fitScale = Math.min(
+        (renderWidth * 0.95) / (sampleCols * 4.4),
+        (renderHeight * 0.94) / (sampleRows * 4.4)
+      );
+
+      drawWidth = sampleCols * 4.4 * fitScale;
+      drawHeight = sampleRows * 4.4 * fitScale;
+
+      if (renderHeight > 650 && drawHeight < renderHeight * 0.75) {
+        drawHeight = Math.min(renderHeight * 0.90, renderWidth * 0.95 * naturalAspect);
+        drawWidth = drawHeight / naturalAspect;
+      }
+
+      offsetX = (renderWidth - drawWidth) / 2;
+      offsetY = (renderHeight - drawHeight) / 2;
+    }
+
+    updateDimensions();
+
+    function decodeBase64Points(b64) {
+      try {
+        const binary = atob(b64);
+        const len = binary.length;
+        const raw = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+          raw[i] = binary.charCodeAt(i);
+        }
+        const pts = [];
+        for (let i = 0; i < len; i += 5) {
+          const x = raw[i];
+          const y = raw[i + 1];
+          const r = raw[i + 2];
+          const g = raw[i + 3];
+          const b = raw[i + 4];
+          const brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+          pts.push({
+            normX: (x + 0.5) / sampleCols,
+            normY: (y + 0.5) / sampleRows,
+            r, g, b, brightness
+          });
+        }
+        return pts;
+      } catch (err) {
+        console.warn("Could not decode avatar data:", err);
+        return [];
+      }
+    }
+
+    let rawPoints = [];
+    if (window.AVATAR_DATA) {
+      rawPoints = decodeBase64Points(window.AVATAR_DATA);
+    }
+
+    function buildParticles(points) {
+      const parts = [];
+      const baseColStep = drawWidth / sampleCols;
+
+      for (let i = 0; i < points.length; i++) {
+        const pt = points[i];
+        const targetX = offsetX + pt.normX * drawWidth;
+        const targetY = offsetY + pt.normY * drawHeight;
+        const baseSize = Math.max(0.7, pt.brightness * (baseColStep * 0.95));
+
+        const scatterAngle = Math.random() * Math.PI * 2;
+        const scatterRadius = 250 + Math.random() * 550;
+        const scatterZ = (Math.random() - 0.5) * 600;
+
+        parts.push({
+          normX: pt.normX,
+          normY: pt.normY,
+          origX: targetX,
+          origY: targetY,
+          origZ: 0,
+          x: targetX + Math.cos(scatterAngle) * scatterRadius,
+          y: targetY + Math.sin(scatterAngle) * scatterRadius,
+          z: scatterZ,
+          vx: (Math.random() - 0.5) * 2,
+          vy: (Math.random() - 0.5) * 2,
+          vz: (Math.random() - 0.5) * 2,
+          baseSize: baseSize,
+          brightness: pt.brightness,
+          alpha: 0.1,
+          targetAlpha: Math.min(1.0, 0.45 + pt.brightness * 0.55),
+          r: pt.r,
+          g: pt.g,
+          b: pt.b,
+          isStar: pt.brightness > 0.85 && Math.random() < 0.15,
+          seedX: Math.cos(scatterAngle),
+          seedY: Math.sin(scatterAngle),
+          seedZ: (Math.random() - 0.5) * 2
+        });
+      }
+      return parts;
+    }
+
+    let particles = buildParticles(rawPoints);
+
+    // If precomputed data was not available, try reading from image (when served via HTTP)
+    if (!particles.length) {
+      const img = new Image();
+      img.src = "assets/images/halftone_avatar.jpg";
+      img.onload = () => {
+        try {
+          const offCanvas = document.createElement("canvas");
+          const offCtx = offCanvas.getContext("2d");
+          offCanvas.width = sampleCols;
+          offCanvas.height = sampleRows;
+          offCtx.drawImage(img, 0, 0, sampleCols, sampleRows);
+          const imgData = offCtx.getImageData(0, 0, sampleCols, sampleRows).data;
+          const fallbackPts = [];
+          for (let y = 0; y < sampleRows; y++) {
+            for (let x = 0; x < sampleCols; x++) {
+              const idx = (y * sampleCols + x) * 4;
+              const r = imgData[idx];
+              const g = imgData[idx + 1];
+              const b = imgData[idx + 2];
+              const brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+              if (brightness > 0.08) {
+                fallbackPts.push({
+                  normX: (x + 0.5) / sampleCols,
+                  normY: (y + 0.5) / sampleRows,
+                  r, g, b, brightness
+                });
+              }
+            }
+          }
+          particles = buildParticles(fallbackPts);
+        } catch (e) {
+          console.warn("Canvas getImageData skipped (CORS/file://):", e.message);
+        }
+      };
+    }
+
+    function recalculateTargets() {
+      updateDimensions();
+      const currentStep = drawWidth / sampleCols;
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.origX = offsetX + p.normX * drawWidth;
+        p.origY = offsetY + p.normY * drawHeight;
+        p.baseSize = Math.max(0.7, p.brightness * (currentStep * 0.95));
+      }
+    }
+
+    window.addEventListener("resize", recalculateTargets, { passive: true });
+
+    // Cursor / Touch 3D Radial Physics Force across the full hero section
+    let mouse = { x: -9999, y: -9999, radius: 120 };
+
+    function updateMousePos(clientX, clientY) {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = (clientX - rect.left) * (renderWidth / (rect.width || 1));
+      mouse.y = (clientY - rect.top) * (renderHeight / (rect.height || 1));
+    }
+
+    hero.addEventListener("mousemove", (e) => {
+      updateMousePos(e.clientX, e.clientY);
+    });
+
+    hero.addEventListener("mouseleave", () => {
+      mouse.x = -9999;
+      mouse.y = -9999;
+    });
+
+    hero.addEventListener("touchmove", (e) => {
+      if (e.touches.length > 0) {
+        updateMousePos(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
+
+    hero.addEventListener("touchend", () => {
+      mouse.x = -9999;
+      mouse.y = -9999;
+    });
+
+    // Scroll-Triggered Assembly & Dispersion
+    let scrollOffset = 0;
+    window.addEventListener("scroll", () => {
+      scrollOffset = window.scrollY;
+    }, { passive: true });
+
+    const fov = 550; // 3D Camera Field of View
+
+    // Safety timeout to ensure assembly if preloader was skipped or completed early
+    setTimeout(() => {
+      isAssembling = true;
+      if (heroImg) heroImg.classList.add("assembled");
+    }, 4200);
+
+    function animate() {
+      ctx.save();
+      ctx.scale(dpr, dpr);
+      ctx.clearRect(0, 0, renderWidth, renderHeight);
+
+      if (isAssembling && assembleProgress < 1.0) {
+        assembleProgress += 0.024;
+        if (assembleProgress > 1.0) assembleProgress = 1.0;
+      }
+
+      // Scroll dispersion factor: after passing hero threshold, particles scatter back into 3D space
+      const scrollStart = Math.max(50, renderHeight * 0.15);
+      const scrollDispersion = Math.max(0, scrollOffset - scrollStart) * 1.1;
+      const scrollFade = scrollOffset <= scrollStart ? 1.0 : Math.max(0, 1 - (scrollOffset - scrollStart) / (renderHeight * 0.65));
+
+      if (heroImg && isAssembling) {
+        heroImg.style.opacity = (0.85 * scrollFade * assembleProgress).toFixed(3);
+      }
+
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+
+        if (isAssembling) {
+          // Target position incorporates scroll dispersion in 3D
+          const targetX = p.origX + (p.seedX * scrollDispersion * 0.85);
+          const targetY = p.origY + (p.seedY * scrollDispersion * 0.65) - (scrollDispersion * 0.3);
+          const targetZ = p.origZ + (p.seedZ * scrollDispersion * 1.5);
+
+          // Magnetic attraction force toward 3D target coordinates
+          const dx = targetX - p.x;
+          const dy = targetY - p.y;
+          const dz = targetZ - p.z;
+
+          p.vx += dx * (0.045 + assembleProgress * 0.05);
+          p.vy += dy * (0.045 + assembleProgress * 0.05);
+          p.vz += dz * (0.045 + assembleProgress * 0.05);
+
+          // Friction damping
+          p.vx *= 0.83;
+          p.vy *= 0.83;
+          p.vz *= 0.83;
+
+          p.x += p.vx;
+          p.y += p.vy;
+          p.z += p.vz;
+
+          p.alpha = Math.min(p.targetAlpha, p.alpha + 0.035);
+        } else {
+          // Ambient drift before assembly
+          p.x += p.vx * 0.25;
+          p.y += p.vy * 0.25;
+          p.z += p.vz * 0.25;
+        }
+
+        // 3D Perspective Projection Calculation
+        const scale = fov / Math.max(20, fov + p.z);
+        const projX = (renderWidth / 2) + (p.x - (renderWidth / 2)) * scale;
+        const projY = (renderHeight / 2) + (p.y - (renderHeight / 2)) * scale;
+        const projSize = Math.max(0.4, p.baseSize * scale);
+
+        // Cursor / Touch 3D Radial Physics Force
+        const mdx = projX - mouse.x;
+        const mdy = projY - mouse.y;
+        const mdist = Math.hypot(mdx, mdy);
+
+        if (mdist < mouse.radius) {
+          const force = (mouse.radius - mdist) / mouse.radius;
+          const angle = Math.atan2(mdy, mdx);
+          p.vx += Math.cos(angle) * force * 12;
+          p.vy += Math.sin(angle) * force * 12;
+          p.vz += (Math.random() - 0.5) * force * 45; // Depth explosion
+        }
+
+        const drawAlpha = Math.max(0, p.alpha * scrollFade * Math.min(1.2, scale));
+
+        if (drawAlpha > 0.02 && projX >= -10 && projX <= renderWidth + 10 && projY >= -10 && projY <= renderHeight + 10) {
+          ctx.beginPath();
+          ctx.arc(projX, projY, projSize, 0, Math.PI * 2);
+          ctx.fillStyle = `rgb(${p.r}, ${p.g}, ${p.b})`;
+          ctx.globalAlpha = drawAlpha;
+
+          if (p.isStar) {
+            ctx.shadowBlur = Math.min(10, 5 * scale);
+            ctx.shadowColor = "#ffffff";
+          }
+          ctx.fill();
+          ctx.shadowBlur = 0;
+          ctx.globalAlpha = 1.0;
+        }
+      }
+
+      ctx.restore();
+      requestAnimationFrame(animate);
+    }
+
+    animate();
   }
 
   // ── 4. FULLSCREEN CURTAIN NAVIGATION MENU ────────────────
