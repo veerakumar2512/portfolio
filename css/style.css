@@ -122,6 +122,109 @@ button {
   opacity: 0.75;
 }
 
+/* ── Custom Pointer Lagging Cursor ─────────────────────── */
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  background: rgba(200, 210, 230, 0.75);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99999;
+  opacity: 0;
+  transform: translate3d(-100px, -100px, 0);
+  box-shadow: 0 0 10px rgba(207, 216, 255, 0.45);
+  transition: opacity 0.3s ease;
+  will-change: transform;
+}
+
+.custom-cursor.active {
+  opacity: 1;
+}
+
+@media (pointer: coarse) {
+  .custom-cursor {
+    display: none !important;
+  }
+}
+
+/* ── Floating "Available for work" Badge (Bottom-Left) ── */
+.floating-available-badge {
+  position: fixed;
+  bottom: 1.75rem;
+  left: 1.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 1.15rem;
+  background: rgba(10, 10, 15, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-full);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: #e2e8f0;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  z-index: 950;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+  transition: transform 0.25s var(--ease), border-color 0.25s var(--ease), background 0.25s var(--ease);
+  text-decoration: none;
+}
+
+.floating-available-badge:hover {
+  transform: translateY(-2px);
+  border-color: rgba(34, 197, 94, 0.4);
+  background: rgba(16, 18, 26, 0.92);
+  color: #ffffff;
+}
+
+.status-pulsing-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  position: relative;
+  display: inline-block;
+  box-shadow: 0 0 10px #22c55e;
+}
+
+.status-pulsing-dot::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1.5px solid #22c55e;
+  animation: greenPulse 2s infinite ease-out;
+  opacity: 0.75;
+}
+
+@keyframes greenPulse {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.9;
+  }
+  70% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .floating-available-badge {
+    bottom: 1rem;
+    left: 1rem;
+    padding: 0.45rem 0.85rem;
+    font-size: 0.72rem;
+  }
+}
+
 /* ── Layout Container ──────────────────────────────────── */
 .container {
   max-width: var(--container);
@@ -457,10 +560,30 @@ button {
   max-width: var(--container);
   width: 100%;
   margin-inline: auto;
+  align-items: center;
+  text-align: center;
 }
 
 .menu-nav-item {
   overflow: hidden;
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+#fullscreen-menu.open .menu-nav-item {
+  animation: menuLinkFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: calc(0.08s + var(--item-index, 0) * 0.07s);
+}
+
+@keyframes menuLinkFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .menu-nav-link {
@@ -535,11 +658,11 @@ button {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding-block: 2.5rem;
-  pointer-events: none;
+  padding-block: 2.5rem 3rem;
+  width: 100%;
 }
 
-/* Giant Metallic Headline */
+/* Giant Metallic Headline: Head & shoulders rise up behind PORTFOLIO */
 .hero-headline {
   font-size: clamp(3.2rem, 11vw, 9.5rem);
   font-weight: 900;
@@ -551,7 +674,8 @@ button {
   -webkit-text-fill-color: transparent;
   margin-bottom: 0.8rem;
   filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.8));
-  pointer-events: none;
+  position: relative;
+  z-index: 3;
 }
 
 .hero-subhead {
@@ -562,7 +686,7 @@ button {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  pointer-events: none;
+  pointer-events: auto;
 }
 
 .hero-subhead em {
@@ -579,7 +703,7 @@ button {
   justify-content: center;
   gap: 1rem;
   flex-wrap: wrap;
-  margin-bottom: 3.5rem;
+  margin-bottom: 2.5rem;
   pointer-events: auto;
 }
 
@@ -594,7 +718,6 @@ button {
   font-weight: 600;
   letter-spacing: 0.02em;
   transition: var(--transition-fast);
-  pointer-events: auto;
 }
 
 .btn-pill-primary {
@@ -622,71 +745,30 @@ button {
   transform: translateY(-2px);
 }
 
-/* Full-Page Borderless 3D Particle Portrait Stage */
+/* Halftone Canvas Portrait: Positioned Below Resume & Contact */
 .particle-portrait-stage {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-inline: 0;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  z-index: 1;
+  position: relative;
+  width: min(92vw, 540px);
+  height: min(65vh, 580px);
+  margin: 0 auto 1.5rem auto;
+  z-index: 2;
   pointer-events: auto;
+  mask-image: linear-gradient(to bottom, black 0%, black 88%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 88%, transparent 100%);
   overflow: hidden;
-}
-
-.portrait-photo-container {
-  position: absolute;
-  inset: 0;
+  will-change: transform, opacity;
   display: flex;
   align-items: center;
   justify-content: center;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.hero-portrait-img {
-  height: min(86vh, 920px);
-  width: auto;
-  max-width: min(94vw, 680px);
-  object-fit: contain;
-  opacity: 0;
-  transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-  transform: scale(0.96);
-  filter: contrast(1.05) brightness(0.95);
-  mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 50%, transparent 95%);
-  -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 50%, transparent 95%);
-}
-
-.hero-portrait-img.assembled {
-  opacity: 0.85;
-  transform: scale(1);
 }
 
 #halftone-canvas {
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
   display: block;
-  cursor: crosshair;
   background: transparent;
-  z-index: 2;
-  filter: drop-shadow(0 0 35px rgba(255, 255, 255, 0.1));
-}
-
-.avatar-fallback-img {
-  width: 100%;
-  max-width: 520px;
-  height: auto;
-  border-radius: var(--radius-md);
-  display: block;
 }
 
 /* Scroll Hint */

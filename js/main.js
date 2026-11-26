@@ -1,17 +1,32 @@
 /* ============================================================
    MAIN.JS — Antigravity Ultra-Minimal Luxury Engine
-   Matches Video 2026-10-23 Frame-by-Frame:
+   Matches Video Frame-by-Frame:
    1. Dot & Slanted Exclamation Mark Reveal
    2. Kinetic Letter Flip (VEERAKUMAR -> PORTFOLIO)
    3. Starfield Cosmic Snow Burst
-   4. Dispersed Particle Cloud Magnetic Face Assembly (00:08 - 00:10)
-   5. Dynamic Scroll Dispersion & Interactive Halftone Shimmer
-   6. Fullscreen Curtain Drawer & Services Accordion
-   7. Interactive LED Dot Matrix Banner
+   4. Low-Resolution Halftone Grid Portrait (60 Cols, Square Cells)
+   5. Interactive Repulsion Physics & Staggered Ease-Out Assembly
+   6. Custom Lagging Pointer Cursor & Floating Availability Badge
+   7. Fullscreen Curtain Drawer & Services Accordion
    ============================================================ */
 
 (function () {
   "use strict";
+
+  // ============================================================
+  // PORTFOLIO CONFIGURATION
+  // Easily customize name, role, portrait image path & animation
+  // Can also be overridden directly in index.html via window.PORTFOLIO_CONFIG
+  // ============================================================
+  window.PORTFOLIO_CONFIG = Object.assign({
+    name: "VEERA KUMAR R",
+    role: "Web Developer | AI & DS",
+    imagePath: "assets/images/halftone_avatar.jpg",
+    sampleCols: 60,         // Sampling resolution (~60 columns wide)
+    assemblyDuration: 1500, // Staggered ease-out assembly duration (ms)
+    scatterRadius: 20,      // Repulsion scatter outward distance (px)
+    cursorLag: 0.16         // Custom cursor lerp factor
+  }, window.PORTFOLIO_CONFIG || {});
 
   // Global event dispatcher for cross-animation triggers
   window.PortfolioAnim = {
@@ -203,341 +218,337 @@
     }, { passive: true });
   }
 
-  // ── 3. BORDERLESS HIGH-CLARITY 3D PARTICLE PORTRAIT ───
+  // ── 3. LOW-RESOLUTION SQUARE HALFTONE PORTRAIT ENGINE ─────
   function initHalftoneAvatar() {
     const canvas = document.getElementById("halftone-canvas");
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const hero = document.getElementById("hero") || canvas.parentElement || document.body;
-    const heroImg = document.getElementById("hero-portrait-img");
+    const config = window.PORTFOLIO_CONFIG || {};
+    const sampleCols = config.sampleCols || 60; // Sampling resolution: ~60 columns wide
+    const assemblyDuration = config.assemblyDuration || 1500;
+    const scatterRadius = config.scatterRadius || 20;
+
+    const stage = canvas.parentElement || canvas;
+    const avatarSrc = (typeof window.AVATAR_DATA_URI !== "undefined" && window.AVATAR_DATA_URI)
+      ? window.AVATAR_DATA_URI
+      : (config.imagePath || "assets/images/halftone_avatar.jpg");
 
     let isAssembling = false;
-    let assembleProgress = 0;
+    let assemblyStartTime = 0;
     let hasTriggeredAssembly = false;
 
-    // Trigger dispatcher hook (ready even before any loading)
+    // Trigger dispatcher hook (called from preloader sequence)
     window.PortfolioAnim.triggerAvatarAssembly = function () {
       hasTriggeredAssembly = true;
       isAssembling = true;
-      if (heroImg) heroImg.classList.add("assembled");
+      assemblyStartTime = performance.now();
     };
 
-    let sampleCols = 104;
-    let sampleRows = 151;
-    let naturalAspect = 1.4519;
+    const img = new Image();
+    img.src = avatarSrc;
 
-    if (window.AVATAR_DIMS) {
-      sampleCols = window.AVATAR_DIMS.cols || sampleCols;
-      sampleRows = window.AVATAR_DIMS.rows || sampleRows;
-      naturalAspect = window.AVATAR_DIMS.aspect || naturalAspect;
-    }
-
-    let renderWidth = 0;
-    let renderHeight = 0;
-    let drawWidth = 0;
-    let drawHeight = 0;
-    let offsetX = 0;
-    let offsetY = 0;
-    let dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-    function updateDimensions() {
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
-      renderWidth = hero.clientWidth || window.innerWidth;
-      renderHeight = hero.clientHeight || window.innerHeight;
-
-      canvas.width = renderWidth * dpr;
-      canvas.height = renderHeight * dpr;
-      canvas.style.width = renderWidth + "px";
-      canvas.style.height = renderHeight + "px";
-
-      // Fit portrait to viewport dimensions:
-      const fitScale = Math.min(
-        (renderWidth * 0.95) / (sampleCols * 4.4),
-        (renderHeight * 0.94) / (sampleRows * 4.4)
-      );
-
-      drawWidth = sampleCols * 4.4 * fitScale;
-      drawHeight = sampleRows * 4.4 * fitScale;
-
-      if (renderHeight > 650 && drawHeight < renderHeight * 0.75) {
-        drawHeight = Math.min(renderHeight * 0.90, renderWidth * 0.95 * naturalAspect);
-        drawWidth = drawHeight / naturalAspect;
+    img.onload = () => {
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (hasTriggeredAssembly || prefersReducedMotion) {
+        isAssembling = true;
+        assemblyStartTime = performance.now();
       }
 
-      offsetX = (renderWidth - drawWidth) / 2;
-      offsetY = (renderHeight - drawHeight) / 2;
-    }
+      const naturalAspect = (img.naturalHeight || 668) / (img.naturalWidth || 461);
+      const sampleRows = Math.round(sampleCols * naturalAspect);
 
-    updateDimensions();
+      let renderWidth = 0;
+      let renderHeight = 0;
+      let drawWidth = 0;
+      let drawHeight = 0;
+      let offsetX = 0;
+      let offsetY = 0;
+      let dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-    function decodeBase64Points(b64) {
+      function setupCanvasSize() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        renderWidth = stage.clientWidth || Math.min(window.innerWidth * 0.92, 540);
+        renderHeight = stage.clientHeight || Math.round(Math.min(window.innerHeight * 0.65, 580));
+
+        canvas.width = Math.round(renderWidth * dpr);
+        canvas.height = Math.round(renderHeight * dpr);
+        canvas.style.width = renderWidth + "px";
+        canvas.style.height = renderHeight + "px";
+
+        // Fit portrait centered within stage
+        const maxWidth = renderWidth * 0.94;
+        const maxHeight = renderHeight * 0.96;
+        const drawScale = Math.min(maxWidth / img.naturalWidth, maxHeight / img.naturalHeight);
+
+        drawWidth = img.naturalWidth * drawScale;
+        drawHeight = img.naturalHeight * drawScale;
+        offsetX = (renderWidth - drawWidth) / 2;
+        offsetY = (renderHeight - drawHeight) / 2;
+      }
+
+      setupCanvasSize();
+
+      // Read pixel brightness from low-resolution hidden canvas
+      let imgData = null;
       try {
-        const binary = atob(b64);
-        const len = binary.length;
-        const raw = new Uint8Array(len);
-        for (let i = 0; i < len; i++) {
-          raw[i] = binary.charCodeAt(i);
-        }
-        const pts = [];
-        for (let i = 0; i < len; i += 5) {
-          const x = raw[i];
-          const y = raw[i + 1];
-          const r = raw[i + 2];
-          const g = raw[i + 3];
-          const b = raw[i + 4];
+        const offCanvas = document.createElement("canvas");
+        offCanvas.width = sampleCols;
+        offCanvas.height = sampleRows;
+        const offCtx = offCanvas.getContext("2d", { willReadFrequently: true });
+        offCtx.drawImage(img, 0, 0, sampleCols, sampleRows);
+        imgData = offCtx.getImageData(0, 0, sampleCols, sampleRows).data;
+      } catch (err) {
+        console.warn("Could not read image pixel data:", err);
+      }
+
+      if (!imgData) return;
+
+      const cells = [];
+      const cellStepX = drawWidth / sampleCols;
+      const cellStepY = drawHeight / sampleRows;
+      const maxCellSize = Math.min(cellStepX, cellStepY) * 0.94;
+
+      for (let row = 0; row < sampleRows; row++) {
+        for (let col = 0; col < sampleCols; col++) {
+          const idx = (row * sampleCols + col) * 4;
+          const r = imgData[idx];
+          const g = imgData[idx + 1];
+          const b = imgData[idx + 2];
+          const a = imgData[idx + 3];
+          if (a < 25) continue;
+
+          // Standard photometric luminance
           const brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-          pts.push({
-            normX: (x + 0.5) / sampleCols,
-            normY: (y + 0.5) / sampleRows,
-            r, g, b, brightness
+
+          // Dark areas become tiny or empty cells so black background shows through
+          if (brightness <= 0.08) continue;
+
+          const normX = (col + 0.5) / sampleCols;
+          const normY = (row + 0.5) / sampleRows;
+          const targetX = offsetX + normX * drawWidth;
+          const targetY = offsetY + normY * drawHeight;
+
+          // Cool white-blue (#cfd8ff to #ffffff)
+          const t = Math.max(0, Math.min(1, (brightness - 0.08) / (1 - 0.08)));
+          const cellR = Math.round(207 + (255 - 207) * t);
+          const cellG = Math.round(216 + (255 - 216) * t);
+          const cellB = 255;
+
+          // Brighter areas become larger, brighter cells
+          const baseSize = Math.max(0.8, brightness * maxCellSize);
+          const baseAlpha = Math.min(1.0, 0.4 + brightness * 0.6);
+
+          // Scattered dust noise position (Stage 2)
+          const angle = Math.random() * Math.PI * 2;
+          const dustDist = 180 + Math.random() * Math.max(renderWidth, renderHeight) * 0.75;
+          const startX = targetX + Math.cos(angle) * dustDist;
+          const startY = targetY + Math.sin(angle) * dustDist;
+
+          // Staggered ease-out timing (about 1.5s total)
+          const staggerDelay = Math.random() * 500;
+          const duration = prefersReducedMotion ? 0 : (1100 + Math.random() * 400);
+
+          cells.push({
+            normX,
+            normY,
+            targetX,
+            targetY,
+            startX,
+            startY,
+            baseX: prefersReducedMotion ? targetX : startX,
+            baseY: prefersReducedMotion ? targetY : startY,
+            dispX: 0,
+            dispY: 0,
+            vx: 0,
+            vy: 0,
+            staggerDelay,
+            duration,
+            brightness,
+            baseSize,
+            baseAlpha,
+            r: cellR,
+            g: cellG,
+            b: cellB,
+            shimmer: 0,
+            assembled: prefersReducedMotion
           });
         }
-        return pts;
-      } catch (err) {
-        console.warn("Could not decode avatar data:", err);
-        return [];
       }
-    }
 
-    let rawPoints = [];
-    if (window.AVATAR_DATA) {
-      rawPoints = decodeBase64Points(window.AVATAR_DATA);
-    }
+      function recalculateTargets() {
+        setupCanvasSize();
+        const currentStepX = drawWidth / sampleCols;
+        const currentStepY = drawHeight / sampleRows;
+        const currentMaxCell = Math.min(currentStepX, currentStepY) * 0.94;
 
-    function buildParticles(points) {
-      const parts = [];
-      const baseColStep = drawWidth / sampleCols;
-
-      for (let i = 0; i < points.length; i++) {
-        const pt = points[i];
-        const targetX = offsetX + pt.normX * drawWidth;
-        const targetY = offsetY + pt.normY * drawHeight;
-        const baseSize = Math.max(0.7, pt.brightness * (baseColStep * 0.95));
-
-        const scatterAngle = Math.random() * Math.PI * 2;
-        const scatterRadius = 250 + Math.random() * 550;
-        const scatterZ = (Math.random() - 0.5) * 600;
-
-        parts.push({
-          normX: pt.normX,
-          normY: pt.normY,
-          origX: targetX,
-          origY: targetY,
-          origZ: 0,
-          x: targetX + Math.cos(scatterAngle) * scatterRadius,
-          y: targetY + Math.sin(scatterAngle) * scatterRadius,
-          z: scatterZ,
-          vx: (Math.random() - 0.5) * 2,
-          vy: (Math.random() - 0.5) * 2,
-          vz: (Math.random() - 0.5) * 2,
-          baseSize: baseSize,
-          brightness: pt.brightness,
-          alpha: 0.1,
-          targetAlpha: Math.min(1.0, 0.45 + pt.brightness * 0.55),
-          r: pt.r,
-          g: pt.g,
-          b: pt.b,
-          isStar: pt.brightness > 0.85 && Math.random() < 0.15,
-          seedX: Math.cos(scatterAngle),
-          seedY: Math.sin(scatterAngle),
-          seedZ: (Math.random() - 0.5) * 2
-        });
+        for (let i = 0; i < cells.length; i++) {
+          const c = cells[i];
+          c.targetX = offsetX + c.normX * drawWidth;
+          c.targetY = offsetY + c.normY * drawHeight;
+          c.baseSize = Math.max(0.8, c.brightness * currentMaxCell);
+          if (c.assembled) {
+            c.baseX = c.targetX;
+            c.baseY = c.targetY;
+          }
+        }
       }
-      return parts;
-    }
 
-    let particles = buildParticles(rawPoints);
+      window.addEventListener("resize", recalculateTargets, { passive: true });
 
-    // If precomputed data was not available, try reading from image (when served via HTTP)
-    if (!particles.length) {
-      const img = new Image();
-      img.src = "assets/images/halftone_avatar.jpg";
-      img.onload = () => {
-        try {
-          const offCanvas = document.createElement("canvas");
-          const offCtx = offCanvas.getContext("2d");
-          offCanvas.width = sampleCols;
-          offCanvas.height = sampleRows;
-          offCtx.drawImage(img, 0, 0, sampleCols, sampleRows);
-          const imgData = offCtx.getImageData(0, 0, sampleCols, sampleRows).data;
-          const fallbackPts = [];
-          for (let y = 0; y < sampleRows; y++) {
-            for (let x = 0; x < sampleCols; x++) {
-              const idx = (y * sampleCols + x) * 4;
-              const r = imgData[idx];
-              const g = imgData[idx + 1];
-              const b = imgData[idx + 2];
-              const brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-              if (brightness > 0.08) {
-                fallbackPts.push({
-                  normX: (x + 0.5) / sampleCols,
-                  normY: (y + 0.5) / sampleRows,
-                  r, g, b, brightness
-                });
+      // Pointer Repulsion Interaction
+      let pointerCanvasX = -9999;
+      let pointerCanvasY = -9999;
+      let pointerActive = false;
+
+      function updateRepulsionPointer(clientX, clientY) {
+        const rect = canvas.getBoundingClientRect();
+        pointerCanvasX = (clientX - rect.left) * (renderWidth / (rect.width || 1));
+        pointerCanvasY = (clientY - rect.top) * (renderHeight / (rect.height || 1));
+        pointerActive = true;
+      }
+
+      function clearRepulsionPointer() {
+        pointerCanvasX = -9999;
+        pointerCanvasY = -9999;
+        pointerActive = false;
+      }
+
+      window.addEventListener("pointermove", (e) => {
+        updateRepulsionPointer(e.clientX, e.clientY);
+      }, { passive: true });
+
+      window.addEventListener("pointerleave", clearRepulsionPointer, { passive: true });
+      window.addEventListener("touchcancel", clearRepulsionPointer, { passive: true });
+
+      // Fallback timer to trigger assembly if intro is skipped
+      setTimeout(() => {
+        if (!isAssembling) {
+          isAssembling = true;
+          assemblyStartTime = performance.now();
+        }
+      }, 1600);
+
+      function easeOutCubic(t) {
+        return 1 - Math.pow(1 - t, 3);
+      }
+
+      const repulsionRadius = 95;
+      const springStiffness = 0.14;
+      const springDamping = 0.80;
+      const parallaxFactor = 0.38;
+      const fadeDistance = 420;
+
+      function render() {
+        ctx.save();
+        ctx.scale(dpr, dpr);
+        ctx.clearRect(0, 0, renderWidth, renderHeight);
+
+        const now = performance.now();
+        const scrollY = window.scrollY || window.pageYOffset || 0;
+
+        // Scroll Parallax and Fadeout (parallaxes slower than text, fades out as next section arrives)
+        const scrollFade = Math.max(0, 1 - scrollY / fadeDistance);
+        const parallaxY = scrollY * parallaxFactor;
+        stage.style.transform = `translateY(${parallaxY.toFixed(2)}px)`;
+        stage.style.opacity = scrollFade.toFixed(3);
+        stage.style.visibility = scrollFade <= 0.002 ? "hidden" : "visible";
+
+        // Subtle Shimmer: a few random cells flicker brightness every frame
+        const shimmerCount = Math.floor(Math.random() * 8) + 5;
+        for (let s = 0; s < shimmerCount; s++) {
+          const randIdx = Math.floor(Math.random() * cells.length);
+          if (cells[randIdx]) {
+            cells[randIdx].shimmer = 0.5 + Math.random() * 0.5;
+          }
+        }
+
+        // Render each SQUARE cell
+        for (let i = 0; i < cells.length; i++) {
+          const c = cells[i];
+
+          // 1. Assembly Progression
+          if (isAssembling && !c.assembled) {
+            const elapsed = now - assemblyStartTime - c.staggerDelay;
+            if (elapsed > 0) {
+              const p = Math.min(1.0, elapsed / c.duration);
+              const ease = easeOutCubic(p);
+              c.baseX = c.startX + (c.targetX - c.startX) * ease;
+              c.baseY = c.startY + (c.targetY - c.startY) * ease;
+              if (p >= 1.0) {
+                c.assembled = true;
+                c.baseX = c.targetX;
+                c.baseY = c.targetY;
               }
             }
           }
-          particles = buildParticles(fallbackPts);
-        } catch (e) {
-          console.warn("Canvas getImageData skipped (CORS/file://):", e.message);
-        }
-      };
-    }
 
-    function recalculateTargets() {
-      updateDimensions();
-      const currentStep = drawWidth / sampleCols;
-      for (let i = 0; i < particles.length; i++) {
-        const p = particles[i];
-        p.origX = offsetX + p.normX * drawWidth;
-        p.origY = offsetY + p.normY * drawHeight;
-        p.baseSize = Math.max(0.7, p.brightness * (currentStep * 0.95));
-      }
-    }
-
-    window.addEventListener("resize", recalculateTargets, { passive: true });
-
-    // Cursor / Touch 3D Radial Physics Force across the full hero section
-    let mouse = { x: -9999, y: -9999, radius: 120 };
-
-    function updateMousePos(clientX, clientY) {
-      const rect = canvas.getBoundingClientRect();
-      mouse.x = (clientX - rect.left) * (renderWidth / (rect.width || 1));
-      mouse.y = (clientY - rect.top) * (renderHeight / (rect.height || 1));
-    }
-
-    hero.addEventListener("mousemove", (e) => {
-      updateMousePos(e.clientX, e.clientY);
-    });
-
-    hero.addEventListener("mouseleave", () => {
-      mouse.x = -9999;
-      mouse.y = -9999;
-    });
-
-    hero.addEventListener("touchmove", (e) => {
-      if (e.touches.length > 0) {
-        updateMousePos(e.touches[0].clientX, e.touches[0].clientY);
-      }
-    }, { passive: true });
-
-    hero.addEventListener("touchend", () => {
-      mouse.x = -9999;
-      mouse.y = -9999;
-    });
-
-    // Scroll-Triggered Assembly & Dispersion
-    let scrollOffset = 0;
-    window.addEventListener("scroll", () => {
-      scrollOffset = window.scrollY;
-    }, { passive: true });
-
-    const fov = 550; // 3D Camera Field of View
-
-    // Safety timeout to ensure assembly if preloader was skipped or completed early
-    setTimeout(() => {
-      isAssembling = true;
-      if (heroImg) heroImg.classList.add("assembled");
-    }, 4200);
-
-    function animate() {
-      ctx.save();
-      ctx.scale(dpr, dpr);
-      ctx.clearRect(0, 0, renderWidth, renderHeight);
-
-      if (isAssembling && assembleProgress < 1.0) {
-        assembleProgress += 0.024;
-        if (assembleProgress > 1.0) assembleProgress = 1.0;
-      }
-
-      // Scroll dispersion factor: after passing hero threshold, particles scatter back into 3D space
-      const scrollStart = Math.max(50, renderHeight * 0.15);
-      const scrollDispersion = Math.max(0, scrollOffset - scrollStart) * 1.1;
-      const scrollFade = scrollOffset <= scrollStart ? 1.0 : Math.max(0, 1 - (scrollOffset - scrollStart) / (renderHeight * 0.65));
-
-      if (heroImg && isAssembling) {
-        heroImg.style.opacity = (0.85 * scrollFade * assembleProgress).toFixed(3);
-      }
-
-      for (let i = 0; i < particles.length; i++) {
-        const p = particles[i];
-
-        if (isAssembling) {
-          // Target position incorporates scroll dispersion in 3D
-          const targetX = p.origX + (p.seedX * scrollDispersion * 0.85);
-          const targetY = p.origY + (p.seedY * scrollDispersion * 0.65) - (scrollDispersion * 0.3);
-          const targetZ = p.origZ + (p.seedZ * scrollDispersion * 1.5);
-
-          // Magnetic attraction force toward 3D target coordinates
-          const dx = targetX - p.x;
-          const dy = targetY - p.y;
-          const dz = targetZ - p.z;
-
-          p.vx += dx * (0.045 + assembleProgress * 0.05);
-          p.vy += dy * (0.045 + assembleProgress * 0.05);
-          p.vz += dz * (0.045 + assembleProgress * 0.05);
-
-          // Friction damping
-          p.vx *= 0.83;
-          p.vy *= 0.83;
-          p.vz *= 0.83;
-
-          p.x += p.vx;
-          p.y += p.vy;
-          p.z += p.vz;
-
-          p.alpha = Math.min(p.targetAlpha, p.alpha + 0.035);
-        } else {
-          // Ambient drift before assembly
-          p.x += p.vx * 0.25;
-          p.y += p.vy * 0.25;
-          p.z += p.vz * 0.25;
-        }
-
-        // 3D Perspective Projection Calculation
-        const scale = fov / Math.max(20, fov + p.z);
-        const projX = (renderWidth / 2) + (p.x - (renderWidth / 2)) * scale;
-        const projY = (renderHeight / 2) + (p.y - (renderHeight / 2)) * scale;
-        const projSize = Math.max(0.4, p.baseSize * scale);
-
-        // Cursor / Touch 3D Radial Physics Force
-        const mdx = projX - mouse.x;
-        const mdy = projY - mouse.y;
-        const mdist = Math.hypot(mdx, mdy);
-
-        if (mdist < mouse.radius) {
-          const force = (mouse.radius - mdist) / mouse.radius;
-          const angle = Math.atan2(mdy, mdx);
-          p.vx += Math.cos(angle) * force * 12;
-          p.vy += Math.sin(angle) * force * 12;
-          p.vz += (Math.random() - 0.5) * force * 45; // Depth explosion
-        }
-
-        const drawAlpha = Math.max(0, p.alpha * scrollFade * Math.min(1.2, scale));
-
-        if (drawAlpha > 0.02 && projX >= -10 && projX <= renderWidth + 10 && projY >= -10 && projY <= renderHeight + 10) {
-          ctx.beginPath();
-          ctx.arc(projX, projY, projSize, 0, Math.PI * 2);
-          ctx.fillStyle = `rgb(${p.r}, ${p.g}, ${p.b})`;
-          ctx.globalAlpha = drawAlpha;
-
-          if (p.isStar) {
-            ctx.shadowBlur = Math.min(10, 5 * scale);
-            ctx.shadowColor = "#ffffff";
+          // 2. Proximity Repulsion Effect (~20px scatter then spring back)
+          if (pointerActive) {
+            const curX = c.baseX + c.dispX;
+            const curY = c.baseY + c.dispY;
+            const mdx = curX - pointerCanvasX;
+            const mdy = curY - pointerCanvasY;
+            const dist = Math.hypot(mdx, mdy);
+            if (dist < repulsionRadius && dist > 0.001) {
+              const force = (1 - dist / repulsionRadius);
+              const angle = Math.atan2(mdy, mdx);
+              const push = force * scatterRadius * 0.38;
+              c.vx += Math.cos(angle) * push;
+              c.vy += Math.sin(angle) * push;
+            }
           }
-          ctx.fill();
-          ctx.shadowBlur = 0;
-          ctx.globalAlpha = 1.0;
+
+          // Spring force back to base grid position
+          c.vx += -c.dispX * springStiffness;
+          c.vy += -c.dispY * springStiffness;
+          c.vx *= springDamping;
+          c.vy *= springDamping;
+          c.dispX += c.vx;
+          c.dispY += c.vy;
+
+          // Clamp scatter offset to ~20px limit
+          const dispDist = Math.hypot(c.dispX, c.dispY);
+          if (dispDist > scatterRadius * 1.2) {
+            const clampRatio = (scatterRadius * 1.2) / dispDist;
+            c.dispX *= clampRatio;
+            c.dispY *= clampRatio;
+          }
+
+          const drawX = c.baseX + c.dispX;
+          const drawY = c.baseY + c.dispY;
+
+          // 3. Shimmer decay & calculation
+          if (c.shimmer > 0) {
+            c.shimmer *= 0.88;
+            if (c.shimmer < 0.01) c.shimmer = 0;
+          }
+
+          // 4. Draw Square Cell
+          const currentCellSize = c.baseSize * (1 + c.shimmer * 0.32);
+          const drawAlpha = Math.min(1.0, (c.baseAlpha + c.shimmer * 0.45) * scrollFade);
+
+          if (drawAlpha > 0.02 &&
+              drawX >= -20 && drawX <= renderWidth + 20 &&
+              drawY >= -20 && drawY <= renderHeight + 20) {
+            ctx.fillStyle = `rgba(${c.r}, ${c.g}, ${c.b}, ${drawAlpha})`;
+            // Draw SQUARE dot/cell
+            ctx.fillRect(
+              drawX - currentCellSize / 2,
+              drawY - currentCellSize / 2,
+              currentCellSize,
+              currentCellSize
+            );
+          }
         }
+
+        ctx.restore();
+        requestAnimationFrame(render);
       }
 
-      ctx.restore();
-      requestAnimationFrame(animate);
-    }
-
-    animate();
+      render();
+    };
   }
 
   // ── 4. FULLSCREEN CURTAIN NAVIGATION MENU ────────────────
@@ -806,9 +817,63 @@
     });
   }
 
+  // ── 10. CUSTOM LAGGING CURSOR ─────────────────────────────
+  function initCustomCursor() {
+    const cursor = document.getElementById("custom-cursor");
+    if (!cursor) return;
+
+    let mouseX = -100;
+    let mouseY = -100;
+    let currentX = -100;
+    let currentY = -100;
+    let isActive = false;
+    const lag = (window.PORTFOLIO_CONFIG && window.PORTFOLIO_CONFIG.cursorLag) || 0.16;
+
+    window.addEventListener("pointermove", (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      if (!isActive) {
+        isActive = true;
+        cursor.classList.add("active");
+      }
+    }, { passive: true });
+
+    window.addEventListener("pointerdown", () => {
+      cursor.style.transform = `translate3d(${(currentX - 4).toFixed(2)}px, ${(currentY - 4).toFixed(2)}px, 0) scale(0.65)`;
+    }, { passive: true });
+
+    window.addEventListener("pointerup", () => {
+      cursor.style.transform = `translate3d(${(currentX - 4).toFixed(2)}px, ${(currentY - 4).toFixed(2)}px, 0) scale(1)`;
+    }, { passive: true });
+
+    function renderCursor() {
+      if (isActive) {
+        currentX += (mouseX - currentX) * lag;
+        currentY += (mouseY - currentY) * lag;
+        cursor.style.transform = `translate3d(${(currentX - 4).toFixed(2)}px, ${(currentY - 4).toFixed(2)}px, 0)`;
+      }
+      requestAnimationFrame(renderCursor);
+    }
+
+    renderCursor();
+  }
+
+  // ── 11. DYNAMIC CONFIGURATION BINDING ─────────────────────
+  function applyPortfolioConfig() {
+    const config = window.PORTFOLIO_CONFIG;
+    if (!config) return;
+    if (config.name) {
+      document.querySelectorAll(".nav-brand").forEach(el => {
+        el.textContent = config.name;
+      });
+    }
+  }
+
   // ── BOOTSTRAP ────────────────────────────────────────────
   document.addEventListener("DOMContentLoaded", () => {
+    applyPortfolioConfig();
     initPreloader();
+    initCustomCursor();
     initStarfield();
     initHalftoneAvatar();
     initNavigation();

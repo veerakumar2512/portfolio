@@ -50,9 +50,32 @@
     "knowsAbout": ["Python", "HTML5", "CSS3", "Web Development", "Data Science", "FlutterFlow", "Colab", "Stitch", "Discord"]
   }
   </script>
+  <!-- ============================================================
+       QUICK PORTFOLIO CONFIGURATION
+       Easily customize your portrait photo, name, and role here!
+  ============================================================ -->
+  <script>
+    window.PORTFOLIO_CONFIG = {
+      name: "VEERA KUMAR R",
+      role: "Web Developer | AI & DS",
+      imagePath: "assets/images/halftone_avatar.jpg", // Photo path (swap your image here)
+      sampleCols: 60,                                 // Low resolution sampling (~60 columns)
+      assemblyDuration: 1500,                         // Staggered ease-out assembly (~1.5s)
+      scatterRadius: 20                               // Mouse repulsion scatter distance (px)
+    };
+  </script>
 </head>
 
 <body>
+  <!-- Custom Lagging Pointer Cursor -->
+  <div id="custom-cursor" class="custom-cursor" aria-hidden="true"></div>
+
+  <!-- Floating "Available for work" Badge (Bottom-Left) -->
+  <a href="#contact" class="floating-available-badge" aria-label="Available for work">
+    <span class="status-pulsing-dot"></span>
+    <span>Available for work</span>
+  </a>
+
   <!-- ============================================================
        0. CINEMATIC PRELOADER SEQUENCE (Matches Video Frame-by-Frame)
   ============================================================ -->
@@ -78,7 +101,7 @@
   <header id="navbar" role="banner">
     <div class="container nav-container">
       <a href="#hero" class="nav-brand" aria-label="Veera Kumar R Home">
-        VEERAKUMAR
+        VEERA KUMAR R
       </a>
 
       <!-- Minimal 2-Line Hamburger -->
@@ -94,27 +117,27 @@
   ============================================================ -->
   <div id="fullscreen-menu" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Navigation Menu">
     <div class="menu-top-bar">
-      <span class="nav-brand">VEERAKUMAR</span>
+      <span class="nav-brand">VEERA KUMAR R</span>
       <button class="menu-close-btn" id="menu-close" aria-label="Close navigation menu">✕</button>
     </div>
 
     <ul class="menu-nav-list" role="list">
-      <li class="menu-nav-item">
+      <li class="menu-nav-item" style="--item-index: 0;">
         <a href="#hero" class="menu-nav-link"><span class="index">01</span> HOME</a>
       </li>
-      <li class="menu-nav-item">
+      <li class="menu-nav-item" style="--item-index: 1;">
         <a href="#about" class="menu-nav-link"><span class="index">02</span> ABOUT</a>
       </li>
-      <li class="menu-nav-item">
-        <a href="#services" class="menu-nav-link"><span class="index">03</span> SERVICES</a>
+      <li class="menu-nav-item" style="--item-index: 2;">
+        <a href="#services" class="menu-nav-link"><span class="index">03</span> SERVICE</a>
       </li>
-      <li class="menu-nav-item">
-        <a href="#projects" class="menu-nav-link"><span class="index">04</span> PROJECTS</a>
+      <li class="menu-nav-item" style="--item-index: 3;">
+        <a href="#projects" class="menu-nav-link"><span class="index">04</span> PROJECT</a>
       </li>
-      <li class="menu-nav-item">
-        <a href="#credentials" class="menu-nav-link"><span class="index">05</span> CREDENTIALS</a>
+      <li class="menu-nav-item" style="--item-index: 4;">
+        <a href="#credentials" class="menu-nav-link"><span class="index">05</span> COMPONENTS</a>
       </li>
-      <li class="menu-nav-item">
+      <li class="menu-nav-item" style="--item-index: 5;">
         <a href="#contact" class="menu-nav-link"><span class="index">06</span> CONTACT</a>
       </li>
     </ul>
@@ -134,17 +157,6 @@
          3. HERO SECTION
     ============================================================ -->
     <section id="hero" aria-label="Introduction">
-      <!-- Full-Page 3D Particle Portrait Stage -->
-      <div class="particle-portrait-stage" aria-label="Interactive particle portrait">
-        <div class="portrait-photo-container">
-          <img src="assets/images/halftone_avatar.jpg" alt="Veera Kumar R" class="hero-portrait-img" id="hero-portrait-img" />
-        </div>
-        <canvas id="halftone-canvas" title="Interactive Halftone Particle Portrait"></canvas>
-        <noscript>
-          <img src="assets/images/halftone_avatar.jpg" alt="Veera Kumar R" class="avatar-fallback-img" />
-        </noscript>
-      </div>
-
       <div class="container hero-layout">
         <!-- Giant Metallic Headline -->
         <h1 class="hero-headline">PORTFOLIO</h1>
@@ -162,6 +174,11 @@
           <a href="assets/resume/veera-kumar-resume.pdf" download="Veera_Kumar_R_Resume.pdf" class="btn-pill btn-pill-outline">
             Resume <span>↓</span>
           </a>
+        </div>
+
+        <!-- Halftone Portrait Stage: Positioned Below Resume & Contact -->
+        <div class="particle-portrait-stage" aria-label="Interactive Halftone Grid Portrait">
+          <canvas id="halftone-canvas" title="Interactive Halftone Grid Portrait"></canvas>
         </div>
 
         <!-- Scroll Indicator -->
@@ -190,7 +207,7 @@
 
         <div class="luxury-card fade-in">
           <p class="intro-bio-text">
-            Hey, I'm <strong>Veera Kumar</strong>. I am a motivated <strong>B.Tech Artificial Intelligence and Data Science</strong> student with knowledge of <strong>Python</strong>, <strong>HTML</strong>, and <strong>CSS</strong>, seeking entry-level opportunities in web development. I enjoy building practical technology solutions, applying my skills through projects, and continuously growing through learning and problem-solving.
+            Hey, I'm <strong>Veera Kumar R</strong>. I am a motivated <strong>B.Tech Artificial Intelligence and Data Science</strong> student with knowledge of <strong>Python</strong>, <strong>HTML</strong>, and <strong>CSS</strong>, seeking entry-level opportunities in web development. I enjoy building practical technology solutions, applying my skills through projects, and continuously growing through learning and problem-solving.
           </p>
 
           <div class="intro-metrics-row">
@@ -343,37 +360,8 @@
               </div>
             </div>
           </div>
-                  <span class="accordion-tag">FastAPI</span>
-                  <span class="accordion-tag">Postman</span>
-                  <span class="accordion-tag">SQLite / MySQL</span>
-                </div>
-              </div>
-            </div>
-          </div>
 
           <!-- Item 05 -->
-          <div class="accordion-item fade-in">
-            <button class="accordion-header" aria-expanded="false">
-              <div class="accordion-title-group">
-                <span class="accordion-num">05</span>
-                <span class="accordion-heading">Web Scraping &amp; Automation Pipelines</span>
-              </div>
-              <span class="accordion-arrow">↘</span>
-            </button>
-            <div class="accordion-content">
-              <div class="accordion-body">
-                Developing custom web crawlers that extract structured datasets from dynamic target sites, with automated proxy handling, rate-limiting safeguards, and automated exports to Excel/CSV.
-                <div class="accordion-tech-row">
-                  <span class="accordion-tag">BeautifulSoup4</span>
-                  <span class="accordion-tag">Requests</span>
-                  <span class="accordion-tag">Pandas</span>
-                  <span class="accordion-tag">Tkinter GUI</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Item 06 -->
           <div class="accordion-item fade-in">
             <button class="accordion-header" aria-expanded="false">
               <div class="accordion-title-group">
@@ -690,8 +678,8 @@
   <!-- ============================================================
        13. SCRIPTS
   ============================================================ -->
-  <script src="js/projects.js"></script>
   <script src="js/avatar-data.js"></script>
+  <script src="js/projects.js"></script>
   <script src="js/main.js"></script>
   <script src="js/form.js"></script>
   <script>
