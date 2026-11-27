@@ -60,7 +60,7 @@
       if (typeof window.PortfolioAnim.triggerAvatarAssembly === "function") {
         setTimeout(() => {
           window.PortfolioAnim.triggerAvatarAssembly();
-        }, 300);
+        }, 550);
       }
 
       setTimeout(() => {
@@ -218,7 +218,14 @@
     }, { passive: true });
   }
 
-  // ── 3. LOW-RESOLUTION SQUARE HALFTONE PORTRAIT ENGINE ─────
+  // ── 3. FULL-SCREEN HALFTONE PORTRAIT ENGINE ────────────────
+  //  Matches reference frames 038–053:
+  //  - Canvas spans the entire viewport (100vw × 100vh) so particles are
+  //    never clipped to a small box.
+  //  - Initial state: particles scattered across the ENTIRE screen.
+  //  - On reveal: particles converge inward to assemble the portrait.
+  //  - On scroll down: portrait disassembles/explodes back outward across
+  //    the full screen before fading out as the About section arrives.
   function initHalftoneAvatar() {
     const canvas = document.getElementById("halftone-canvas");
     if (!canvas) return;
@@ -226,9 +233,8 @@
     if (!ctx) return;
 
     const config = window.PORTFOLIO_CONFIG || {};
-    const sampleCols = config.sampleCols || 60; // Sampling resolution: ~60 columns wide
-    const assemblyDuration = config.assemblyDuration || 1500;
-    const scatterRadius = config.scatterRadius || 20;
+    const sampleCols = config.sampleCols || 60;
+    const scatterRadius = config.scatterRadius || 28;
 
     const stage = canvas.parentElement || canvas;
     const avatarSrc = (typeof window.AVATAR_DATA_URI !== "undefined" && window.AVATAR_DATA_URI)
@@ -239,7 +245,6 @@
     let assemblyStartTime = 0;
     let hasTriggeredAssembly = false;
 
-    // Trigger dispatcher hook (called from preloader sequence)
     window.PortfolioAnim.triggerAvatarAssembly = function () {
       hasTriggeredAssembly = true;
       isAssembling = true;
@@ -269,28 +274,33 @@
 
       function setupCanvasSize() {
         dpr = Math.min(window.devicePixelRatio || 1, 2);
-        renderWidth = stage.clientWidth || Math.min(window.innerWidth * 0.92, 540);
-        renderHeight = stage.clientHeight || Math.round(Math.min(window.innerHeight * 0.65, 580));
+        renderWidth = window.innerWidth;
+        renderHeight = window.innerHeight;
 
         canvas.width = Math.round(renderWidth * dpr);
         canvas.height = Math.round(renderHeight * dpr);
         canvas.style.width = renderWidth + "px";
         canvas.style.height = renderHeight + "px";
 
-        // Fit portrait centered within stage
-        const maxWidth = renderWidth * 0.94;
-        const maxHeight = renderHeight * 0.96;
+        const stageRect = stage.getBoundingClientRect();
+        const scrollNow = window.scrollY || window.pageYOffset || 0;
+        const stageW = stageRect.width || Math.min(renderWidth * 0.92, 540);
+        const stageH = stageRect.height || Math.round(Math.min(renderHeight * 0.65, 580));
+        const stageLeft = stageRect.left || (renderWidth - stageW) / 2;
+        const stageTopAtZero = (stageRect.top + scrollNow) || Math.round(renderHeight * 0.34);
+
+        const maxWidth = stageW * 0.98;
+        const maxHeight = stageH * 1.02;
         const drawScale = Math.min(maxWidth / img.naturalWidth, maxHeight / img.naturalHeight);
 
         drawWidth = img.naturalWidth * drawScale;
         drawHeight = img.naturalHeight * drawScale;
-        offsetX = (renderWidth - drawWidth) / 2;
-        offsetY = (renderHeight - drawHeight) / 2;
+        offsetX = stageLeft + (stageW - drawWidth) / 2;
+        offsetY = stageTopAtZero + (stageH - drawHeight) / 2;
       }
 
       setupCanvasSize();
 
-      // Read pixel brightness from low-resolution hidden canvas
       let imgData = null;
       try {
         const offCanvas = document.createElement("canvas");
@@ -302,13 +312,12 @@
       } catch (err) {
         console.warn("Could not read image pixel data:", err);
       }
-
       if (!imgData) return;
 
       const cells = [];
       const cellStepX = drawWidth / sampleCols;
       const cellStepY = drawHeight / sampleRows;
-      const maxCellSize = Math.min(cellStepX, cellStepY) * 0.94;
+      const maxCellSize = Math.min(cellStepX, cellStepY) * 0.95;
 
       for (let row = 0; row < sampleRows; row++) {
         for (let col = 0; col < sampleCols; col++) {
@@ -319,58 +328,48 @@
           const a = imgData[idx + 3];
           if (a < 25) continue;
 
-          // Standard photometric luminance
-          const brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+          const rawBrightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+          if (rawBrightness <= 0.06) continue;
 
-          // Dark areas become tiny or empty cells so black background shows through
-          if (brightness <= 0.08) continue;
+          // Boost midtones slightly so the portrait is crisp and luminous
+          const brightness = Math.pow(rawBrightness, 0.74);
 
           const normX = (col + 0.5) / sampleCols;
           const normY = (row + 0.5) / sampleRows;
           const targetX = offsetX + normX * drawWidth;
           const targetY = offsetY + normY * drawHeight;
 
-          // Cool white-blue (#cfd8ff to #ffffff)
-          const t = Math.max(0, Math.min(1, (brightness - 0.08) / (1 - 0.08)));
-          const cellR = Math.round(207 + (255 - 207) * t);
-          const cellG = Math.round(216 + (255 - 216) * t);
+          // Cool ice-blue to pure white palette matching reference
+          const t = Math.max(0, Math.min(1, (brightness - 0.1) / 0.9));
+          const cellR = Math.round(140 + (255 - 140) * t);
+          const cellG = Math.round(180 + (255 - 180) * t);
           const cellB = 255;
 
-          // Brighter areas become larger, brighter cells
-          const baseSize = Math.max(0.8, brightness * maxCellSize);
-          const baseAlpha = Math.min(1.0, 0.4 + brightness * 0.6);
+          const baseSize = Math.max(1.2, brightness * maxCellSize * 1.05);
+          const baseAlpha = Math.min(1.0, 0.52 + brightness * 0.48);
 
-          // Scattered dust noise position (Stage 2)
-          const angle = Math.random() * Math.PI * 2;
-          const dustDist = 180 + Math.random() * Math.max(renderWidth, renderHeight) * 0.75;
-          const startX = targetX + Math.cos(angle) * dustDist;
-          const startY = targetY + Math.sin(angle) * dustDist;
+          // Full-viewport scatter positions (used both on initial load & scroll explosion)
+          const startX = Math.random() * renderWidth;
+          const startY = Math.random() * renderHeight;
 
-          // Staggered ease-out timing (about 1.5s total)
-          const staggerDelay = Math.random() * 500;
-          const duration = prefersReducedMotion ? 0 : (1100 + Math.random() * 400);
+          // Slight center-out / vertical column stagger like frames 040–044
+          const distFromCenterX = Math.abs(normX - 0.5) * 2;
+          const staggerDelay = distFromCenterX * 420 + Math.random() * 850;
+          const duration = prefersReducedMotion ? 0 : (1900 + Math.random() * 900);
 
           cells.push({
-            normX,
-            normY,
-            targetX,
-            targetY,
-            startX,
-            startY,
+            normX, normY,
+            targetX, targetY,
+            startX, startY,
             baseX: prefersReducedMotion ? targetX : startX,
             baseY: prefersReducedMotion ? targetY : startY,
-            dispX: 0,
-            dispY: 0,
-            vx: 0,
-            vy: 0,
+            dispX: 0, dispY: 0, vx: 0, vy: 0,
             staggerDelay,
             duration,
             brightness,
             baseSize,
             baseAlpha,
-            r: cellR,
-            g: cellG,
-            b: cellB,
+            r: cellR, g: cellG, b: cellB,
             shimmer: 0,
             assembled: prefersReducedMotion
           });
@@ -379,66 +378,48 @@
 
       function recalculateTargets() {
         setupCanvasSize();
-        const currentStepX = drawWidth / sampleCols;
-        const currentStepY = drawHeight / sampleRows;
-        const currentMaxCell = Math.min(currentStepX, currentStepY) * 0.94;
-
+        const currentMaxCell = Math.min(drawWidth / sampleCols, drawHeight / sampleRows) * 0.95;
         for (let i = 0; i < cells.length; i++) {
           const c = cells[i];
           c.targetX = offsetX + c.normX * drawWidth;
           c.targetY = offsetY + c.normY * drawHeight;
-          c.baseSize = Math.max(0.8, c.brightness * currentMaxCell);
+          c.baseSize = Math.max(1.2, c.brightness * currentMaxCell * 1.05);
           if (c.assembled) {
             c.baseX = c.targetX;
             c.baseY = c.targetY;
           }
         }
       }
-
       window.addEventListener("resize", recalculateTargets, { passive: true });
 
-      // Pointer Repulsion Interaction
-      let pointerCanvasX = -9999;
-      let pointerCanvasY = -9999;
-      let pointerActive = false;
-
-      function updateRepulsionPointer(clientX, clientY) {
-        const rect = canvas.getBoundingClientRect();
-        pointerCanvasX = (clientX - rect.left) * (renderWidth / (rect.width || 1));
-        pointerCanvasY = (clientY - rect.top) * (renderHeight / (rect.height || 1));
+      // Pointer repulsion (auto-releases on touch end or when pointer stops moving so face restructures)
+      let pointerCanvasX = -9999, pointerCanvasY = -9999, pointerActive = false;
+      let lastPointerMoveTime = 0;
+      function updateRepulsionPointer(cx, cy) {
+        pointerCanvasX = cx;
+        pointerCanvasY = cy;
         pointerActive = true;
+        lastPointerMoveTime = performance.now();
       }
-
       function clearRepulsionPointer() {
-        pointerCanvasX = -9999;
-        pointerCanvasY = -9999;
-        pointerActive = false;
+        pointerCanvasX = -9999; pointerCanvasY = -9999; pointerActive = false;
       }
-
-      window.addEventListener("pointermove", (e) => {
-        updateRepulsionPointer(e.clientX, e.clientY);
-      }, { passive: true });
-
+      window.addEventListener("pointermove", (e) => updateRepulsionPointer(e.clientX, e.clientY), { passive: true });
+      window.addEventListener("pointerup", clearRepulsionPointer, { passive: true });
       window.addEventListener("pointerleave", clearRepulsionPointer, { passive: true });
+      window.addEventListener("touchend", clearRepulsionPointer, { passive: true });
       window.addEventListener("touchcancel", clearRepulsionPointer, { passive: true });
 
-      // Fallback timer to trigger assembly if intro is skipped
+      // Fallback: trigger if preloader already dismissed
       setTimeout(() => {
-        if (!isAssembling) {
-          isAssembling = true;
-          assemblyStartTime = performance.now();
-        }
+        if (!isAssembling) { isAssembling = true; assemblyStartTime = performance.now(); }
       }, 1600);
 
-      function easeOutCubic(t) {
-        return 1 - Math.pow(1 - t, 3);
-      }
+      function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
 
-      const repulsionRadius = 95;
-      const springStiffness = 0.14;
-      const springDamping = 0.80;
-      const parallaxFactor = 0.38;
-      const fadeDistance = 420;
+      const repulsionRadius = 100;
+      const springStiffness = 0.12;
+      const springDamping = 0.78;
 
       function render() {
         ctx.save();
@@ -446,29 +427,37 @@
         ctx.clearRect(0, 0, renderWidth, renderHeight);
 
         const now = performance.now();
+        if (pointerActive && now - lastPointerMoveTime > 220) {
+          pointerActive = false;
+        }
         const scrollY = window.scrollY || window.pageYOffset || 0;
 
-        // Scroll Parallax and Fadeout (parallaxes slower than text, fades out as next section arrives)
-        const scrollFade = Math.max(0, 1 - scrollY / fadeDistance);
-        const parallaxY = scrollY * parallaxFactor;
-        stage.style.transform = `translateY(${parallaxY.toFixed(2)}px)`;
-        stage.style.opacity = scrollFade.toFixed(3);
-        stage.style.visibility = scrollFade <= 0.002 ? "hidden" : "visible";
+        // Scroll disassembly (frames 050–053):
+        // Hold briefly (0–120px), then slowly scatter outward (120–680px)
+        // and fade out smoothly (360–760px) before reaching the About section.
+        const scatterProgress = prefersReducedMotion ? 0 : Math.min(1, Math.max(0, (scrollY - 120) / 560));
+        const scatterEase = scatterProgress * scatterProgress * (3 - 2 * scatterProgress);
+        const scrollFade = Math.max(0, 1 - Math.max(0, scrollY - 360) / 400);
 
-        // Subtle Shimmer: a few random cells flicker brightness every frame
-        const shimmerCount = Math.floor(Math.random() * 8) + 5;
-        for (let s = 0; s < shimmerCount; s++) {
-          const randIdx = Math.floor(Math.random() * cells.length);
-          if (cells[randIdx]) {
-            cells[randIdx].shimmer = 0.5 + Math.random() * 0.5;
-          }
+        canvas.style.visibility = scrollFade <= 0.002 ? "hidden" : "visible";
+
+        if (scrollFade <= 0.002) {
+          ctx.restore();
+          requestAnimationFrame(render);
+          return;
         }
 
-        // Render each SQUARE cell
+        // Shimmer: random cells flicker each frame
+        const shimmerCount = Math.floor(Math.random() * 10) + 6;
+        for (let s = 0; s < shimmerCount; s++) {
+          const ri = Math.floor(Math.random() * cells.length);
+          if (cells[ri] && cells[ri].assembled) cells[ri].shimmer = 0.6 + Math.random() * 0.4;
+        }
+
         for (let i = 0; i < cells.length; i++) {
           const c = cells[i];
 
-          // 1. Assembly Progression
+          // ── ASSEMBLY: fly from full-screen scatter to portrait target ──
           if (isAssembling && !c.assembled) {
             const elapsed = now - assemblyStartTime - c.staggerDelay;
             if (elapsed > 0) {
@@ -484,23 +473,27 @@
             }
           }
 
-          // 2. Proximity Repulsion Effect (~20px scatter then spring back)
-          if (pointerActive) {
-            const curX = c.baseX + c.dispX;
-            const curY = c.baseY + c.dispY;
+          // Apply scroll-driven disassembly + gentle upward drift
+          const scrollOffsetY = scrollY * 0.35;
+          const currentAnchorX = c.baseX + (c.startX - c.baseX) * scatterEase;
+          const currentAnchorY = (c.baseY - scrollOffsetY) + (c.startY - (c.baseY - scrollOffsetY)) * scatterEase;
+
+          // ── REPULSION PHYSICS ──────────────────────────────────────
+          if (pointerActive && scatterEase < 0.5) {
+            const curX = currentAnchorX + c.dispX;
+            const curY = currentAnchorY + c.dispY;
             const mdx = curX - pointerCanvasX;
             const mdy = curY - pointerCanvasY;
             const dist = Math.hypot(mdx, mdy);
             if (dist < repulsionRadius && dist > 0.001) {
-              const force = (1 - dist / repulsionRadius);
-              const angle = Math.atan2(mdy, mdx);
-              const push = force * scatterRadius * 0.38;
-              c.vx += Math.cos(angle) * push;
-              c.vy += Math.sin(angle) * push;
+              const force = 1 - dist / repulsionRadius;
+              const ang = Math.atan2(mdy, mdx);
+              const push = force * scatterRadius * 0.4;
+              c.vx += Math.cos(ang) * push;
+              c.vy += Math.sin(ang) * push;
             }
           }
 
-          // Spring force back to base grid position
           c.vx += -c.dispX * springStiffness;
           c.vy += -c.dispY * springStiffness;
           c.vx *= springDamping;
@@ -508,32 +501,26 @@
           c.dispX += c.vx;
           c.dispY += c.vy;
 
-          // Clamp scatter offset to ~20px limit
           const dispDist = Math.hypot(c.dispX, c.dispY);
           if (dispDist > scatterRadius * 1.2) {
-            const clampRatio = (scatterRadius * 1.2) / dispDist;
-            c.dispX *= clampRatio;
-            c.dispY *= clampRatio;
+            const cr = (scatterRadius * 1.2) / dispDist;
+            c.dispX *= cr; c.dispY *= cr;
           }
 
-          const drawX = c.baseX + c.dispX;
-          const drawY = c.baseY + c.dispY;
+          const drawX = currentAnchorX + c.dispX;
+          const drawY = currentAnchorY + c.dispY;
 
-          // 3. Shimmer decay & calculation
-          if (c.shimmer > 0) {
-            c.shimmer *= 0.88;
-            if (c.shimmer < 0.01) c.shimmer = 0;
-          }
+          // Shimmer decay
+          if (c.shimmer > 0) { c.shimmer *= 0.85; if (c.shimmer < 0.01) c.shimmer = 0; }
 
-          // 4. Draw Square Cell
-          const currentCellSize = c.baseSize * (1 + c.shimmer * 0.32);
-          const drawAlpha = Math.min(1.0, (c.baseAlpha + c.shimmer * 0.45) * scrollFade);
+          // ── DRAW SQUARE CELL ───────────────────────────────────────
+          const currentCellSize = c.baseSize * (1 + c.shimmer * 0.4);
+          const drawAlpha = Math.min(1.0, (c.baseAlpha + c.shimmer * 0.5) * scrollFade);
 
           if (drawAlpha > 0.02 &&
-              drawX >= -20 && drawX <= renderWidth + 20 &&
-              drawY >= -20 && drawY <= renderHeight + 20) {
+              drawX >= -currentCellSize && drawX <= renderWidth + currentCellSize &&
+              drawY >= -currentCellSize && drawY <= renderHeight + currentCellSize) {
             ctx.fillStyle = `rgba(${c.r}, ${c.g}, ${c.b}, ${drawAlpha})`;
-            // Draw SQUARE dot/cell
             ctx.fillRect(
               drawX - currentCellSize / 2,
               drawY - currentCellSize / 2,

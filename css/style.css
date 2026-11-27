@@ -687,6 +687,8 @@ button {
   align-items: center;
   gap: 0.5rem;
   pointer-events: auto;
+  position: relative;
+  z-index: 3;
 }
 
 .hero-subhead em {
@@ -705,6 +707,8 @@ button {
   flex-wrap: wrap;
   margin-bottom: 2.5rem;
   pointer-events: auto;
+  position: relative;
+  z-index: 3;
 }
 
 /* Luxury Pill Buttons */
@@ -745,30 +749,28 @@ button {
   transform: translateY(-2px);
 }
 
-/* Halftone Canvas Portrait: Positioned Below Resume & Contact */
+/* Halftone Canvas Portrait Stage: Layout anchor in Hero; canvas itself spans full viewport */
 .particle-portrait-stage {
   position: relative;
   width: min(92vw, 540px);
   height: min(65vh, 580px);
   margin: 0 auto 1.5rem auto;
   z-index: 2;
-  pointer-events: auto;
-  mask-image: linear-gradient(to bottom, black 0%, black 88%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 88%, transparent 100%);
-  overflow: hidden;
-  will-change: transform, opacity;
+  pointer-events: none;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 #halftone-canvas {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   display: block;
   background: transparent;
+  pointer-events: none;
+  z-index: 2;
 }
 
 /* Scroll Hint */
